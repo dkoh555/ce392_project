@@ -1,0 +1,359 @@
+
+BeginView lanedetect_top lanedetect_top
+Inst: i_RST_in_RNINP03   i_RST_in_RNINP03_cZ inv 
+Inst: i_PIXEL_in[23]   i_PIXEL_in_23_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[22]   i_PIXEL_in_22_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[21]   i_PIXEL_in_21_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[20]   i_PIXEL_in_20_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[19]   i_PIXEL_in_19_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[18]   i_PIXEL_in_18_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[17]   i_PIXEL_in_17_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[16]   i_PIXEL_in_16_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[15]   i_PIXEL_in_15_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[14]   i_PIXEL_in_14_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[13]   i_PIXEL_in_13_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[12]   i_PIXEL_in_12_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[11]   i_PIXEL_in_11_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[10]   i_PIXEL_in_10_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[9]   i_PIXEL_in_9_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[8]   i_PIXEL_in_8_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[7]   i_PIXEL_in_7_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[6]   i_PIXEL_in_6_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[5]   i_PIXEL_in_5_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[4]   i_PIXEL_in_4_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[3]   i_PIXEL_in_3_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[2]   i_PIXEL_in_2_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[1]   i_PIXEL_in_1_ cyclonev_io_ibuf 
+Inst: i_PIXEL_in[0]   i_PIXEL_in_0_ cyclonev_io_ibuf 
+Inst: o_PIXEL_out[7]   o_PIXEL_out_7_ cyclonev_io_obuf 
+Inst: o_PIXEL_out[6]   o_PIXEL_out_6_ cyclonev_io_obuf 
+Inst: o_PIXEL_out[5]   o_PIXEL_out_5_ cyclonev_io_obuf 
+Inst: o_PIXEL_out[4]   o_PIXEL_out_4_ cyclonev_io_obuf 
+Inst: o_PIXEL_out[3]   o_PIXEL_out_3_ cyclonev_io_obuf 
+Inst: o_PIXEL_out[2]   o_PIXEL_out_2_ cyclonev_io_obuf 
+Inst: o_PIXEL_out[1]   o_PIXEL_out_1_ cyclonev_io_obuf 
+Inst: o_PIXEL_out[0]   o_PIXEL_out_0_ cyclonev_io_obuf 
+Net:  grayscale_inst.q_state[0]   grayscale_inst_q_state[0] 
+Net:  input_fifo_inst.fifo_buf[9]   input_fifo_inst_fifo_buf[9] 
+Net:  input_fifo_inst.fifo_buf[10]   input_fifo_inst_fifo_buf[10] 
+Net:  input_fifo_inst.fifo_buf[8]   input_fifo_inst_fifo_buf[8] 
+Net:  input_fifo_inst.fifo_buf[0]   input_fifo_inst_fifo_buf[0] 
+Net:  input_fifo_inst.fifo_buf[1]   input_fifo_inst_fifo_buf[1] 
+Net:  input_fifo_inst.fifo_buf[2]   input_fifo_inst_fifo_buf[2] 
+Net:  input_fifo_inst.fifo_buf[3]   input_fifo_inst_fifo_buf[3] 
+Net:  input_fifo_inst.fifo_buf[4]   input_fifo_inst_fifo_buf[4] 
+Net:  input_fifo_inst.fifo_buf[5]   input_fifo_inst_fifo_buf[5] 
+Net:  input_fifo_inst.fifo_buf[6]   input_fifo_inst_fifo_buf[6] 
+Net:  input_fifo_inst.fifo_buf[7]   input_fifo_inst_fifo_buf[7] 
+Net:  input_fifo_inst.fifo_buf[21]   input_fifo_inst_fifo_buf[21] 
+Net:  input_fifo_inst.fifo_buf[22]   input_fifo_inst_fifo_buf[22] 
+Net:  input_fifo_inst.fifo_buf[23]   input_fifo_inst_fifo_buf[23] 
+Net:  input_fifo_inst.fifo_buf[11]   input_fifo_inst_fifo_buf[11] 
+Net:  input_fifo_inst.fifo_buf[12]   input_fifo_inst_fifo_buf[12] 
+Net:  input_fifo_inst.fifo_buf[13]   input_fifo_inst_fifo_buf[13] 
+Net:  input_fifo_inst.fifo_buf[14]   input_fifo_inst_fifo_buf[14] 
+Net:  input_fifo_inst.fifo_buf[15]   input_fifo_inst_fifo_buf[15] 
+Net:  input_fifo_inst.fifo_buf[16]   input_fifo_inst_fifo_buf[16] 
+Net:  input_fifo_inst.fifo_buf[17]   input_fifo_inst_fifo_buf[17] 
+Net:  input_fifo_inst.fifo_buf[18]   input_fifo_inst_fifo_buf[18] 
+Net:  input_fifo_inst.fifo_buf[19]   input_fifo_inst_fifo_buf[19] 
+Net:  input_fifo_inst.fifo_buf[20]   input_fifo_inst_fifo_buf[20] 
+EndView lanedetect_top lanedetect_top
+
+BeginView grayscale_540_720 grayscale_540_720
+Inst: q_state_RNO[0]   q_state_RNO_0_ cyclonev_lcell_comb 
+Inst: q_state[0]   q_state_0_ dffeas 
+Inst: un1_i_pixel_1[15:1]   un1_i_pixel_1_15_1_ lanedetect_top_cyclonev_mac_Um18x18_sumof2_8_7_15_2 
+Inst: state_comb\.un7_n_grayscale_pixel[15:0]   state_comb_un7_n_grayscale_pixel_15_0_ lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1 
+EndView grayscale_540_720 grayscale_540_720
+
+BeginView lanedetect_top_cyclonev_mac_Um18x18_sumof2_8_7_15_2 NoName
+EndView lanedetect_top_cyclonev_mac_Um18x18_sumof2_8_7_15_2 NoName
+
+BeginView lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1 NoName
+EndView lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1 NoName
+
+BeginView fifo_0 fifo_0
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_25_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_25_mux_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_24_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_24_mux_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.mlab   fifo_buf_mlab syn_mlab_0 
+Inst: dout_0[6]   dout_0_6_ ghost 
+Inst: dout_0[5]   dout_0_5_ ghost 
+Inst: dout_0[4]   dout_0_4_ ghost 
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_31_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_31_mux_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_30_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_30_mux_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_29_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_29_mux_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_28_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_28_mux_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_27_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_27_mux_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.grayscale_fifo_inst.fifo_buf_26_mux[0]   fifo_buf_grayscale_fifo_inst_fifo_buf_26_mux_0_ cyclonev_lcell_comb 
+Inst: dout[5]   dout_5_ ghost 
+Inst: dout[4]   dout_4_ ghost 
+Inst: dout[3]   dout_3_ ghost 
+Inst: dout_0[7]   dout_0_7_ ghost 
+Inst: dout[1]   dout_1_ ghost 
+Inst: dout[0]   dout_0_ ghost 
+Inst: dout_0[3]   dout_0_3_ ghost 
+Inst: dout_0[2]   dout_0_2_ ghost 
+Inst: dout_0[1]   dout_0_1_ ghost 
+Inst: dout_0[0]   dout_0_0_ ghost 
+Inst: dout[7]   dout_7_ ghost 
+Inst: dout[6]   dout_6_ ghost 
+Inst: dout[2]   dout_2_ ghost 
+Inst: wr_addr_RNO[1]   wr_addr_RNO_1_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[0]   wr_addr_RNO_0_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[3]   wr_addr_RNO_3_ cyclonev_lcell_comb 
+Inst: wr_addr_RNIQ4L41[1]   wr_addr_RNIQ4L41_1_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[5]   wr_addr_RNO_5_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[4]   wr_addr_RNO_4_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[2]   wr_addr_RNO_2_ cyclonev_lcell_comb 
+Inst: wr_addr_RNI4C311[1]   wr_addr_RNI4C311_1_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[6]   wr_addr_RNO_6_ cyclonev_lcell_comb 
+Inst: fifo_buf.OUT[0]   fifo_buf_OUT_0_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[6]   un10_rd_addr_t_1_SUM_6_ cyclonev_lcell_comb 
+Inst: un10_rd_addr_t_1_SUM[5]   un10_rd_addr_t_1_SUM_5_ cyclonev_lcell_comb 
+Inst: full_0   full_0_cZ cyclonev_lcell_comb 
+Inst: wr_addr[4]   wr_addr_4_ dffeas 
+Inst: rd_addr[4]   rd_addr_4_ dffeas 
+Inst: fifo_buf.wen_0[1]   fifo_buf_wen_0_1_ cyclonev_lcell_comb 
+Inst: fifo_buf.wen_0[0]   fifo_buf_wen_0_0_ cyclonev_lcell_comb 
+Inst: un10_rd_addr_t_1_SUM[2]   un10_rd_addr_t_1_SUM_2_ cyclonev_lcell_comb 
+Inst: un10_rd_addr_t_1_SUM[4]   un10_rd_addr_t_1_SUM_4_ cyclonev_lcell_comb 
+Inst: rd_addr[1]   rd_addr_1_ dffeas 
+Inst: wr_addr[0]   wr_addr_0_ dffeas 
+Inst: wr_addr[5]   wr_addr_5_ dffeas 
+Inst: rd_addr[0]   rd_addr_0_ dffeas 
+Inst: rd_addr[5]   rd_addr_5_ dffeas 
+Inst: rd_addr[2]   rd_addr_2_ dffeas 
+Inst: rd_addr[6]   rd_addr_6_ dffeas 
+Inst: full_4_1   full_4_1_cZ cyclonev_lcell_comb 
+Inst: wr_addr[1]   wr_addr_1_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[1]   un10_rd_addr_t_1_SUM_1_ cyclonev_lcell_comb 
+Inst: wr_addr[2]   wr_addr_2_ dffeas 
+Inst: empty_t_NE_0   empty_t_NE_0_cZ cyclonev_lcell_comb 
+Inst: wr_addr[6]   wr_addr_6_ dffeas 
+Inst: rd_addr[3]   rd_addr_3_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[3]   un10_rd_addr_t_1_SUM_3_ cyclonev_lcell_comb 
+Inst: un10_rd_addr_t_1_CO2   un10_rd_addr_t_1_CO2_cZ cyclonev_lcell_comb 
+Inst: wr_addr[3]   wr_addr_3_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[0]   un10_rd_addr_t_1_SUM_0_ cyclonev_lcell_comb 
+Inst: full_4_0   full_4_0_cZ cyclonev_lcell_comb 
+EndView fifo_0 fifo_0
+
+BeginView syn_mlab_0 syn_mlab_0
+Inst: grayscale_fifo_inst.fifo_buf_30_0[6]   grayscale_fifo_inst_fifo_buf_30_0_6_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_30[6]   grayscale_fifo_inst_fifo_buf_30_6_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_31_0[7]   grayscale_fifo_inst_fifo_buf_31_0_7_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_31[7]   grayscale_fifo_inst_fifo_buf_31_7_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_28_0[4]   grayscale_fifo_inst_fifo_buf_28_0_4_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_28[4]   grayscale_fifo_inst_fifo_buf_28_4_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_29_0[5]   grayscale_fifo_inst_fifo_buf_29_0_5_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_29[5]   grayscale_fifo_inst_fifo_buf_29_5_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_26_0[2]   grayscale_fifo_inst_fifo_buf_26_0_2_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_26[2]   grayscale_fifo_inst_fifo_buf_26_2_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_27_0[3]   grayscale_fifo_inst_fifo_buf_27_0_3_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_27[3]   grayscale_fifo_inst_fifo_buf_27_3_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_24_0[0]   grayscale_fifo_inst_fifo_buf_24_0_0_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_24[0]   grayscale_fifo_inst_fifo_buf_24_0_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_25_0[1]   grayscale_fifo_inst_fifo_buf_25_0_1_ cyclonev_mlab_cell 
+Inst: grayscale_fifo_inst.fifo_buf_25[1]   grayscale_fifo_inst_fifo_buf_25_1_ cyclonev_mlab_cell 
+EndView syn_mlab_0 syn_mlab_0
+
+BeginView fifo fifo
+Inst: dout[8]   dout_8_ ghost 
+Inst: dout[7]   dout_7_ ghost 
+Inst: dout[6]   dout_6_ ghost 
+Inst: dout[5]   dout_5_ ghost 
+Inst: dout[4]   dout_4_ ghost 
+Inst: dout[3]   dout_3_ ghost 
+Inst: dout[2]   dout_2_ ghost 
+Inst: dout[1]   dout_1_ ghost 
+Inst: dout[0]   dout_0_ ghost 
+Inst: fifo_buf.mlab   fifo_buf_mlab syn_mlab 
+Inst: dout[23]   dout_23_ ghost 
+Inst: dout[22]   dout_22_ ghost 
+Inst: dout[21]   dout_21_ ghost 
+Inst: dout[20]   dout_20_ ghost 
+Inst: dout[19]   dout_19_ ghost 
+Inst: dout[18]   dout_18_ ghost 
+Inst: dout[17]   dout_17_ ghost 
+Inst: dout[16]   dout_16_ ghost 
+Inst: dout[15]   dout_15_ ghost 
+Inst: dout[14]   dout_14_ ghost 
+Inst: dout[13]   dout_13_ ghost 
+Inst: dout[12]   dout_12_ ghost 
+Inst: dout[11]   dout_11_ ghost 
+Inst: dout[10]   dout_10_ ghost 
+Inst: dout[9]   dout_9_ ghost 
+Inst: wr_addr_RNO[2]   wr_addr_RNO_2_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[1]   wr_addr_RNO_1_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[0]   wr_addr_RNO_0_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[4]   wr_addr_RNO_4_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[6]   wr_addr_RNO_6_ cyclonev_lcell_comb 
+Inst: wr_addr_RNIVUDD[2]   wr_addr_RNIVUDD_2_ cyclonev_lcell_comb 
+Inst: wr_addr_RNIJHSB[2]   wr_addr_RNIJHSB_2_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[5]   wr_addr_RNO_5_ cyclonev_lcell_comb 
+Inst: wr_addr_RNO[3]   wr_addr_RNO_3_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg[5]   fifo_buf_datareg_5_ dffeas 
+Inst: fifo_buf.datareg[4]   fifo_buf_datareg_4_ dffeas 
+Inst: fifo_buf.datareg[7]   fifo_buf_datareg_7_ dffeas 
+Inst: fifo_buf.datareg[6]   fifo_buf_datareg_6_ dffeas 
+Inst: fifo_buf.datareg[11]   fifo_buf_datareg_11_ dffeas 
+Inst: fifo_buf.datareg[23]   fifo_buf_datareg_23_ dffeas 
+Inst: fifo_buf.datareg[3]   fifo_buf_datareg_3_ dffeas 
+Inst: fifo_buf.datareg[21]   fifo_buf_datareg_21_ dffeas 
+Inst: fifo_buf.datareg[20]   fifo_buf_datareg_20_ dffeas 
+Inst: fifo_buf.datareg[19]   fifo_buf_datareg_19_ dffeas 
+Inst: fifo_buf.datareg[22]   fifo_buf_datareg_22_ dffeas 
+Inst: fifo_buf.datareg[17]   fifo_buf_datareg_17_ dffeas 
+Inst: fifo_buf.datareg[2]   fifo_buf_datareg_2_ dffeas 
+Inst: fifo_buf.datareg[1]   fifo_buf_datareg_1_ dffeas 
+Inst: fifo_buf.datareg[18]   fifo_buf_datareg_18_ dffeas 
+Inst: fifo_buf.datareg[13]   fifo_buf_datareg_13_ dffeas 
+Inst: fifo_buf.datareg[12]   fifo_buf_datareg_12_ dffeas 
+Inst: fifo_buf.datareg[14]   fifo_buf_datareg_14_ dffeas 
+Inst: fifo_buf.datareg[10]   fifo_buf_datareg_10_ dffeas 
+Inst: fifo_buf.datareg[9]   fifo_buf_datareg_9_ dffeas 
+Inst: fifo_buf.datareg[8]   fifo_buf_datareg_8_ dffeas 
+Inst: fifo_buf.datareg[16]   fifo_buf_datareg_16_ dffeas 
+Inst: fifo_buf.datareg[15]   fifo_buf_datareg_15_ dffeas 
+Inst: fifo_buf.datareg[0]   fifo_buf_datareg_0_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[6]   un10_rd_addr_t_1_SUM_6_ cyclonev_lcell_comb 
+Inst: full_0   full_0_cZ cyclonev_lcell_comb 
+Inst: fifo_buf.addrreg[5]   fifo_buf_addrreg_5_ dffeas 
+Inst: p_write_buffer\.wr_addr_t   p_write_buffer_wr_addr_t cyclonev_lcell_comb 
+Inst: fifo_buf.wen_0[1]   fifo_buf_wen_0_1_ cyclonev_lcell_comb 
+Inst: fifo_buf.wen_0[0]   fifo_buf_wen_0_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.addrreg[4]   fifo_buf_addrreg_4_ dffeas 
+Inst: fifo_buf.addrreg[3]   fifo_buf_addrreg_3_ dffeas 
+Inst: fifo_buf.addrreg[2]   fifo_buf_addrreg_2_ dffeas 
+Inst: fifo_buf.addrreg[1]   fifo_buf_addrreg_1_ dffeas 
+Inst: fifo_buf.wereg[0]   fifo_buf_wereg_0_ dffeas 
+Inst: fifo_buf.addrreg[0]   fifo_buf_addrreg_0_ dffeas 
+Inst: rd_addr[4]   rd_addr_4_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[4]   un10_rd_addr_t_1_SUM_4_ cyclonev_lcell_comb 
+Inst: wr_addr[4]   wr_addr_4_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[0]   un10_rd_addr_t_1_SUM_0_ cyclonev_lcell_comb 
+Inst: rd_addr[0]   rd_addr_0_ dffeas 
+Inst: wr_addr[5]   wr_addr_5_ dffeas 
+Inst: rd_addr[1]   rd_addr_1_ dffeas 
+Inst: rd_addr[5]   rd_addr_5_ dffeas 
+Inst: wr_addr[0]   wr_addr_0_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[5]   un10_rd_addr_t_1_SUM_5_ cyclonev_lcell_comb 
+Inst: un10_rd_addr_t_1_CO4   un10_rd_addr_t_1_CO4_cZ cyclonev_lcell_comb 
+Inst: rd_addr[6]   rd_addr_6_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[3]   un10_rd_addr_t_1_SUM_3_ cyclonev_lcell_comb 
+Inst: rd_addr[3]   rd_addr_3_ dffeas 
+Inst: empty_t_NE_0   empty_t_NE_0_cZ cyclonev_lcell_comb 
+Inst: wr_addr[6]   wr_addr_6_ dffeas 
+Inst: rd_addr[2]   rd_addr_2_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[2]   un10_rd_addr_t_1_SUM_2_ cyclonev_lcell_comb 
+Inst: wr_addr[2]   wr_addr_2_ dffeas 
+Inst: wr_addr[1]   wr_addr_1_ dffeas 
+Inst: full_4_1   full_4_1_cZ cyclonev_lcell_comb 
+Inst: un10_rd_addr_t_1_CO0   un10_rd_addr_t_1_CO0_cZ cyclonev_lcell_comb 
+Inst: wr_addr[3]   wr_addr_3_ dffeas 
+Inst: un10_rd_addr_t_1_SUM[1]   un10_rd_addr_t_1_SUM_1_ cyclonev_lcell_comb 
+Inst: fifo_buf.addrreg_RNIQHQF[4]   fifo_buf_addrreg_RNIQHQF_4_ cyclonev_lcell_comb 
+Inst: fifo_buf.addrreg_RNIEN8C[2]   fifo_buf_addrreg_RNIEN8C_2_ cyclonev_lcell_comb 
+Inst: fifo_buf.mlab_fifo_buf_1_0_RNI99I61[0]   fifo_buf_mlab_fifo_buf_1_0_RNI99I61_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNICIVH1[2]   fifo_buf_datareg_RNICIVH1_2_ cyclonev_lcell_comb 
+Inst: fifo_buf.addrreg_RNIA5N8[0]   fifo_buf_addrreg_RNIA5N8_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.mlab_fifo_buf_4_RNII4QO[0]   fifo_buf_mlab_fifo_buf_4_RNII4QO_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.mlab_fifo_buf_5_RNILD741[0]   fifo_buf_mlab_fifo_buf_5_RNILD741_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.mlab_fifo_buf_6_RNIOMKV[0]   fifo_buf_mlab_fifo_buf_6_RNIOMKV_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIFRCD1[3]   fifo_buf_datareg_RNIFRCD1_3_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNI1IS11[9]   fifo_buf_datareg_RNI1IS11_9_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIS4P81[11]   fifo_buf_datareg_RNIS4P81_11_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIVD641[12]   fifo_buf_datareg_RNIVD641_12_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIU8F61[8]   fifo_buf_datareg_RNIU8F61_8_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNI501B1[14]   fifo_buf_datareg_RNI501B1_14_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNI605B1[0]   fifo_buf_datareg_RNI605B1_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIBIR11[16]   fifo_buf_datareg_RNIBIR11_16_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIER8D1[17]   fifo_buf_datareg_RNIER8D1_17_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIH4M81[18]   fifo_buf_datareg_RNIH4M81_18_ cyclonev_lcell_comb 
+Inst: fifo_buf.mlab_fifo_buf_19_RNIKD3K[0]   fifo_buf_mlab_fifo_buf_19_RNIKD3K_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIS7261[20]   fifo_buf_datareg_RNIS7261_20_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIVGF11[21]   fifo_buf_datareg_RNIVGF11_21_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNI2QSC1[22]   fifo_buf_datareg_RNI2QSC1_22_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNI53A81[23]   fifo_buf_datareg_RNI53A81_23_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNIPRBT[10]   fifo_buf_datareg_RNIPRBT_10_ cyclonev_lcell_comb 
+Inst: fifo_buf.mlab_fifo_buf_7_0_RNIRV1R[0]   fifo_buf_mlab_fifo_buf_7_0_RNIRV1R_0_ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNI2NJV[13]   fifo_buf_datareg_RNI2NJV_13_ cyclonev_lcell_comb 
+Inst: full_4_0   full_4_0_cZ cyclonev_lcell_comb 
+Inst: fifo_buf.datareg_RNI89E61[15]   fifo_buf_datareg_RNI89E61_15_ cyclonev_lcell_comb 
+Net:  fifo_buf_9[0]   fifo_buf_9_Z[0] 
+Net:  fifo_buf_3[0]   fifo_buf_3_Z[0] 
+Net:  fifo_buf_13[0]   fifo_buf_13_Z[0] 
+Net:  fifo_buf_23[0]   fifo_buf_23_Z[0] 
+Net:  fifo_buf_8[0]   fifo_buf_8_Z[0] 
+Net:  fifo_buf_1[0]   fifo_buf_1_Z[0] 
+Net:  fifo_buf_2[0]   fifo_buf_2_Z[0] 
+Net:  fifo_buf_11[0]   fifo_buf_11_Z[0] 
+Net:  fifo_buf_16[0]   fifo_buf_16_Z[0] 
+Net:  fifo_buf_5[0]   fifo_buf_5_Z[0] 
+Net:  fifo_buf_21[0]   fifo_buf_21_Z[0] 
+Net:  fifo_buf_19[0]   fifo_buf_19_Z[0] 
+Net:  fifo_buf_7[0]   fifo_buf_7_Z[0] 
+Net:  fifo_buf_4[0]   fifo_buf_4_Z[0] 
+Net:  fifo_buf_12[0]   fifo_buf_12_Z[0] 
+Net:  fifo_buf_0[0]   fifo_buf_0_Z[0] 
+Net:  fifo_buf_22[0]   fifo_buf_22_Z[0] 
+Net:  fifo_buf_18[0]   fifo_buf_18_Z[0] 
+Net:  fifo_buf_6[0]   fifo_buf_6_Z[0] 
+Net:  fifo_buf_17[0]   fifo_buf_17_Z[0] 
+Net:  fifo_buf_10[0]   fifo_buf_10_Z[0] 
+Net:  fifo_buf_15[0]   fifo_buf_15_Z[0] 
+Net:  fifo_buf_14[0]   fifo_buf_14_Z[0] 
+Net:  fifo_buf_20[0]   fifo_buf_20_Z[0] 
+EndView fifo fifo
+
+BeginView syn_mlab syn_mlab
+Inst: input_fifo_inst.fifo_buf_23_0[23]   input_fifo_inst_fifo_buf_23_0_23_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_15_0[15]   input_fifo_inst_fifo_buf_15_0_15_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_21_0[21]   input_fifo_inst_fifo_buf_21_0_21_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_16_0[16]   input_fifo_inst_fifo_buf_16_0_16_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_22_0[22]   input_fifo_inst_fifo_buf_22_0_22_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_13_0[13]   input_fifo_inst_fifo_buf_13_0_13_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_19_0[19]   input_fifo_inst_fifo_buf_19_0_19_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_14_0[14]   input_fifo_inst_fifo_buf_14_0_14_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_20_0[20]   input_fifo_inst_fifo_buf_20_0_20_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_11_0[11]   input_fifo_inst_fifo_buf_11_0_11_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_17_0[17]   input_fifo_inst_fifo_buf_17_0_17_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_10_0[10]   input_fifo_inst_fifo_buf_10_0_10_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_3_0[3]   input_fifo_inst_fifo_buf_3_0_3_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_9_0[9]   input_fifo_inst_fifo_buf_9_0_9_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_2_0[2]   input_fifo_inst_fifo_buf_2_0_2_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_8_0[8]   input_fifo_inst_fifo_buf_8_0_8_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_1_0[1]   input_fifo_inst_fifo_buf_1_0_1_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_7_0[7]   input_fifo_inst_fifo_buf_7_0_7_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_0_0[0]   input_fifo_inst_fifo_buf_0_0_0_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_6_0[6]   input_fifo_inst_fifo_buf_6_0_6_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_12_0[12]   input_fifo_inst_fifo_buf_12_0_12_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_18_0[18]   input_fifo_inst_fifo_buf_18_0_18_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_5_0[5]   input_fifo_inst_fifo_buf_5_0_5_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_4_0[4]   input_fifo_inst_fifo_buf_4_0_4_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_17[17]   input_fifo_inst_fifo_buf_17_17_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_23[23]   input_fifo_inst_fifo_buf_23_23_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_18[18]   input_fifo_inst_fifo_buf_18_18_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_22[22]   input_fifo_inst_fifo_buf_22_22_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_15[15]   input_fifo_inst_fifo_buf_15_15_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_21[21]   input_fifo_inst_fifo_buf_21_21_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_16[16]   input_fifo_inst_fifo_buf_16_16_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_20[20]   input_fifo_inst_fifo_buf_20_20_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_13[13]   input_fifo_inst_fifo_buf_13_13_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_19[19]   input_fifo_inst_fifo_buf_19_19_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_14[14]   input_fifo_inst_fifo_buf_14_14_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_5[5]   input_fifo_inst_fifo_buf_5_5_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_11[11]   input_fifo_inst_fifo_buf_11_11_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_4[4]   input_fifo_inst_fifo_buf_4_4_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_10[10]   input_fifo_inst_fifo_buf_10_10_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_3[3]   input_fifo_inst_fifo_buf_3_3_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_9[9]   input_fifo_inst_fifo_buf_9_9_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_2[2]   input_fifo_inst_fifo_buf_2_2_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_8[8]   input_fifo_inst_fifo_buf_8_8_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_1[1]   input_fifo_inst_fifo_buf_1_1_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_7[7]   input_fifo_inst_fifo_buf_7_7_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_0[0]   input_fifo_inst_fifo_buf_0_0_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_6[6]   input_fifo_inst_fifo_buf_6_6_ cyclonev_mlab_cell 
+Inst: input_fifo_inst.fifo_buf_12[12]   input_fifo_inst_fifo_buf_12_12_ cyclonev_mlab_cell 
+EndView syn_mlab syn_mlab

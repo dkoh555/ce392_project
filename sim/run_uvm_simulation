@@ -1,0 +1,7 @@
+#!/bin/csh
+
+source /vol/eecs392/env/questasim.env
+mkdir -p lib
+cp $UVM_HOME/examples/Makefile.questa .
+make -f Makefile.questa dpi_lib32 LIBDIR=lib
+vsim -do lanedetect_sim.do

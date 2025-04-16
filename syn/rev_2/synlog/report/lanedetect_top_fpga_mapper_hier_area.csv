@@ -1,0 +1,8 @@
+
+. Module name, ATOMS, SHARED ARITHMATIC MODE, COMB ARITHMETIC MODE, REGISTERS, SYNC RAMS, MACs
+. lanedetect_top, 96, 0, 0, 63, 0, 2
+.	. fifo, 58, 0, 0, 46, 0, 0
+.	.	. syn_mlab, 0, 0, 0, 0, 0, 0
+.	. fifo_0, 37, 0, 0, 16, 0, 0
+.	.	. syn_mlab_0, 0, 0, 0, 0, 0, 0
+.	. grayscale_540_720, 1, 0, 0, 1, 0, 2

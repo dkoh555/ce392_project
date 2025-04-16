@@ -1,0 +1,448 @@
+# Mon Apr 14 13:05:50 2025
+
+
+Copyright (C) 1994-2018 Synopsys, Inc.
+This Synopsys software and all associated documentation are proprietary to Synopsys, Inc.
+and may only be used pursuant to the terms and conditions of a written license agreement
+with Synopsys, Inc. All other use, reproduction, modification, or distribution of the
+Synopsys software or the associated documentation is strictly prohibited.
+Tool: Synplify (R) Premier
+Build: O-2018.09-SP1
+Install: /vol/synopsys/fpga/O-2018.09-SP1
+OS: Red Hat Enterprise Linux 8.10 (Ootpa)
+Hostname: joker.ece.northwestern.edu
+max virtual memory: unlimited (bytes)
+max user processes: 126625
+max stack size: 8388608 (bytes)
+
+
+Implementation : rev_2
+Synopsys Intel FPGA Technology Mapper, Version maprc, Build 4745R, Built Nov 27 2018 21:14:52
+
+
+Mapper Startup Complete (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 98MB peak: 99MB)
+
+@N: MF284 |Setting synthesis effort to medium for the design
+@N: MF915 |Option synthesis_strategy=advanced is enabled. 
+@N: MF248 |Running in 64-bit mode.
+@N: MF666 |Clock conversion enabled. (Command "set_option -fix_gated_and_generated_clocks 1" in the project file.)
+
+Design Input Complete (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 98MB peak: 100MB)
+
+
+Mapper Initialization Complete (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 98MB peak: 100MB)
+
+@W: FA406 |Environment variable QUARTUS_ROOTDIR not set. Cannot determine PAR version.
+@N: FA350 |Clearbox flow is not supported when QUARTUS_ROOTDIR is not set
+@N: FA351 |Clearbox flow is not supported because clearbox does not exist
+@W: FA352 |Not using the Clearbox flow might affect timing correlation and Quality of Results (QoR).
+@N: MF284 |Setting synthesis effort to medium for the design
+
+
+Starting Optimization and Mapping (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 114MB peak: 116MB)
+
+
+Available hyper_sources - for debug and ip models
+	None Found
+
+
+Finished RTL optimizations (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 115MB peak: 116MB)
+
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName_0 (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName_1 (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName_2 (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName_3 (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName_4 (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName_5 (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance NoName_6 (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[8] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[9] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[10] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[11] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[12] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[13] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[14] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[15] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[16] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[17] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[18] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[19] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[20] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[21] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[22] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Removing sequential instance grayscale_inst.q_grayscale_pixel[23] (in view: VhdlGenLib.syn_mac_0(preserved)) of type view:PrimLib.dffr(prim) because it does not drive other instances.
+
+Starting Early Timing Optimization (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 115MB peak: 116MB)
+
+
+Finished Early Timing Optimization (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 115MB peak: 116MB)
+
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[0] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[1] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[2] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[3] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[4] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[5] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[6] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[7] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[8] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[9] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[10] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[11] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[12] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[13] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[14] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[15] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[16] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[17] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[18] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[19] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[20] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[21] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[22] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance input_fifo_inst.dout[23] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[0] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[0] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[1] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[1] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[2] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[2] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[3] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[3] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[4] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[4] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[5] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[5] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[6] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[6] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance dout[7] (in view: work.fifo_0(verilog_alt0)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register dout[7] (in view: work.fifo_0(verilog_alt0)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+
+Starting factoring (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 115MB peak: 116MB)
+
+
+Finished factoring (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 115MB peak: 116MB)
+
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[0] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[0] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[1] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[1] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[2] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[2] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[3] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[3] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[4] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[4] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[5] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[5] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[6] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[6] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@N: BN362 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Removing sequential instance grayscale_fifo_inst.dout_0[7] (in view: work.lanedetect_top(rtl)) of type view:PrimLib.dff(prim) because it does not drive other instances.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0[7] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@W: FX107 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":35:4:35:12|RAM grayscale_fifo_inst.fifo_buf[7:0] (in view: work.lanedetect_top(rtl)) does not have a read/write conflict check. Possible simulation mismatch. To resolve a read/write conflict, either set syn_ramstyle = rw_check, or enable the "Read Write Check on RAM" Implementation Option. For more information, search for "read/write conflict check" in Online Help.
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[7] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[6] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[5] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[4] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[3] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[2] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[1] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+@A: BN291 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":50:4:50:12|Boundary register grayscale_fifo_inst.dout_0_0[0] (in view: work.lanedetect_top(rtl)) is packed into a complex cell. To disable register packing, set syn_keep=1 on the net between the register and the complex cell. 
+
+Starting gated-clock and generated-clock conversion (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 119MB peak: 121MB)
+
+
+Finished gated-clock and generated-clock conversion (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 119MB peak: 121MB)
+
+
+Finished generic timing optimizations - Pass 1 (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 120MB peak: 121MB)
+
+
+Starting Early Timing Optimization (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 120MB peak: 121MB)
+
+
+Finished Early Timing Optimization (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 120MB peak: 121MB)
+
+
+Finished generic timing optimizations - Pass 2 (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 120MB peak: 121MB)
+
+
+Starting Early Timing Optimization (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 120MB peak: 121MB)
+
+
+Finished Early Timing Optimization (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 120MB peak: 121MB)
+
+@N: MF794 |RAM fifo_buf[7:0] required 1 registers during mapping 
+@N: MF794 |RAM input_fifo_inst.fifo_buf[23:0] required 31 registers during mapping 
+
+Finished preparing to map (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 120MB peak: 121MB)
+
+
+Finished technology mapping (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 122MB peak: 125MB)
+
+
+Finished technology timing optimizations and critical path resynthesis (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 122MB peak: 125MB)
+
+
+Finished restoring hierarchy (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 123MB peak: 125MB)
+
+
+
+@S |Clock Optimization Summary
+
+
+#### START OF CLOCK OPTIMIZATION REPORT #####[
+
+1 non-gated/non-generated clock tree(s) driving 145 clock pin(s) of sequential element(s)
+0 gated/generated clock tree(s) driving 0 clock pin(s) of sequential element(s)
+0 instances converted, 0 sequential instances remain driven by gated/generated clocks
+
+============================== Non-Gated/Non-Generated Clocks ===============================
+Clock Tree ID     Driving Element     Drive Element Type     Fanout     Sample Instance      
+---------------------------------------------------------------------------------------------
+@K:CKID0001       i_CLK_in            cyclonev_io_ibuf       145        input_fifo_inst.empty
+=============================================================================================
+
+
+##### END OF CLOCK OPTIMIZATION REPORT ######]
+
+
+
+Start Writing Netlists (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 110MB peak: 125MB)
+
+Writing Analyst data base /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_m.srm
+
+Finished Writing Netlist Databases (Real Time elapsed 0h:00m:00s; CPU Time elapsed 0h:00m:00s; Memory used current: 121MB peak: 125MB)
+
+Writing Verilog Netlist and constraint files
+Writing .vqm output for Quartus
+
+Writing scf file... (Real Time elapsed 0h:00m:01s; CPU Time elapsed 0h:00m:00s; Memory used current: 123MB peak: 126MB)
+
+@N: BW103 |The default time unit for the Synopsys Constraint File (SDC or FDC) is 1ns.
+@N: BW107 |Synopsys Constraint File capacitance units using default value of 1pF 
+Writing FDC file /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top_synplify.fdc
+
+Finished Writing Verilog Netlist and constraint files (Real Time elapsed 0h:00m:01s; CPU Time elapsed 0h:00m:00s; Memory used current: 121MB peak: 126MB)
+
+
+Start final timing analysis (Real Time elapsed 0h:00m:01s; CPU Time elapsed 0h:00m:01s; Memory used current: 122MB peak: 126MB)
+
+@W: MT420 |Found inferred clock lanedetect_top|i_CLK with period 10.00ns. Please declare a user-defined clock on port i_CLK.
+
+
+##### START OF TIMING REPORT #####[
+# Timing Report written on Mon Apr 14 13:05:52 2025
+#
+
+
+Top view:               lanedetect_top
+Requested Frequency:    100.0 MHz
+Wire load mode:         top
+Paths requested:        5
+Constraint File(s):    
+@N: MT320 |This timing report is an estimate of place and route data. For final timing results, use the FPGA vendor place and route report.
+
+@N: MT322 |Clock constraints include only register-to-register paths associated with each individual clock.
+
+
+
+Performance Summary
+*******************
+
+
+Worst slack in design: 1.795
+
+                         Requested     Estimated     Requested     Estimated               Clock        Clock              
+Starting Clock           Frequency     Frequency     Period        Period        Slack     Type         Group              
+---------------------------------------------------------------------------------------------------------------------------
+lanedetect_top|i_CLK     100.0 MHz     121.9 MHz     10.000        8.205         1.795     inferred     Inferred_clkgroup_0
+===========================================================================================================================
+
+
+
+
+
+Clock Relationships
+*******************
+
+Clocks                                      |    rise  to  rise   |    fall  to  fall   |    rise  to  fall   |    fall  to  rise 
+----------------------------------------------------------------------------------------------------------------------------------
+Starting              Ending                |  constraint  slack  |  constraint  slack  |  constraint  slack  |  constraint  slack
+----------------------------------------------------------------------------------------------------------------------------------
+lanedetect_top|i_CLK  lanedetect_top|i_CLK  |  10.000      1.795  |  No paths    -      |  No paths    -      |  No paths    -    
+==================================================================================================================================
+ Note: 'No paths' indicates there are no paths in the design for that pair of clock edges.
+       'Diff grp' indicates that paths exist but the starting clock and ending clock are in different clock groups.
+
+
+
+Interface Information 
+*********************
+
+No IO constraint found
+
+
+
+====================================
+Detailed Report for Clock: lanedetect_top|i_CLK
+====================================
+
+
+
+Starting Points with Worst Slack
+********************************
+
+                               Starting                                                   Arrival          
+Instance                       Reference                Type       Pin     Net            Time        Slack
+                               Clock                                                                       
+-----------------------------------------------------------------------------------------------------------
+input_fifo_inst.wr_addr[3]     lanedetect_top|i_CLK     dffeas     q       wr_addr[3]     0.983       1.795
+input_fifo_inst.wr_addr[1]     lanedetect_top|i_CLK     dffeas     q       wr_addr[1]     0.983       1.928
+input_fifo_inst.wr_addr[2]     lanedetect_top|i_CLK     dffeas     q       wr_addr[2]     0.983       1.930
+input_fifo_inst.rd_addr[2]     lanedetect_top|i_CLK     dffeas     q       rd_addr[2]     0.983       1.987
+input_fifo_inst.wr_addr[6]     lanedetect_top|i_CLK     dffeas     q       wr_addr[6]     0.983       2.002
+input_fifo_inst.rd_addr[3]     lanedetect_top|i_CLK     dffeas     q       rd_addr[3]     0.983       2.031
+input_fifo_inst.rd_addr[6]     lanedetect_top|i_CLK     dffeas     q       rd_addr[6]     0.983       2.059
+input_fifo_inst.wr_addr[0]     lanedetect_top|i_CLK     dffeas     q       wr_addr[0]     0.983       2.061
+input_fifo_inst.rd_addr[5]     lanedetect_top|i_CLK     dffeas     q       rd_addr[5]     0.983       2.085
+input_fifo_inst.rd_addr[1]     lanedetect_top|i_CLK     dffeas     q       rd_addr[1]     0.983       2.099
+===========================================================================================================
+
+
+Ending Points with Worst Slack
+******************************
+
+                                                           Starting                                                                                                   Required          
+Instance                                                   Reference                Type                                                    Pin       Net             Time         Slack
+                                                           Clock                                                                                                                        
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[0]     fifo_buf_8      8.166        1.795
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[1]     fifo_buf_9      8.166        1.795
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[2]     fifo_buf_10     8.166        1.795
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[3]     fifo_buf_11     8.166        1.795
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[4]     fifo_buf_12     8.166        1.795
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[5]     fifo_buf_13     8.166        1.795
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[6]     fifo_buf_14     8.166        1.795
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1            ax[7]     fifo_buf_15     8.166        1.795
+grayscale_inst.un1_i_pixel_1[15:1]                         lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um18x18_sumof2_8_7_15_2     ax[0]     fifo_buf_0      8.166        1.795
+grayscale_inst.un1_i_pixel_1[15:1]                         lanedetect_top|i_CLK     lanedetect_top_cyclonev_mac_Um18x18_sumof2_8_7_15_2     ax[1]     fifo_buf_1      8.166        1.795
+========================================================================================================================================================================================
+
+
+
+Worst Path Information
+***********************
+
+
+Path information for path number 1: 
+      Requested Period:                      10.000
+    - Setup time:                            1.834
+    + Clock delay at ending point:           0.000 (ideal)
+    = Required time:                         8.166
+
+    - Propagation time:                      5.456
+    - Intrinsic clock delay:                 0.915
+    - Clock delay at starting point:         0.000 (ideal)
+    = Slack (critical) :                     1.795
+
+    Number of logic level(s):                8
+    Starting point:                          input_fifo_inst.wr_addr[3] / q
+    Ending point:                            grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0] / ax[1]
+    The start point is clocked by            lanedetect_top|i_CLK [rising] on pin clk
+    The end   point is clocked by            lanedetect_top|i_CLK [rising] on pin clk[0]
+
+Instance / Net                                                                                              Pin         Pin               Arrival     No. of    
+Name                                                       Type                                             Name        Dir     Delay     Time        Fan Out(s)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+input_fifo_inst.wr_addr[3]                                 dffeas                                           q           Out     0.068     0.983       -         
+wr_addr[3]                                                 Net                                              -           -       0.712     -           54        
+input_fifo_inst.full_4_0                                   cyclonev_lcell_comb                              datae       In      -         1.694       -         
+input_fifo_inst.full_4_0                                   cyclonev_lcell_comb                              combout     Out     0.234     1.929       -         
+full_4_0                                                   Net                                              -           -       0.365     -           2         
+input_fifo_inst.empty_t_NE                                 cyclonev_lcell_comb                              datae       In      -         2.293       -         
+input_fifo_inst.empty_t_NE                                 cyclonev_lcell_comb                              combout     Out     0.234     2.527       -         
+empty_t_i                                                  Net                                              -           -       0.365     -           2         
+input_fifo_inst.un10_rd_addr_t_1_CO0                       cyclonev_lcell_comb                              dataf       In      -         2.893       -         
+input_fifo_inst.un10_rd_addr_t_1_CO0                       cyclonev_lcell_comb                              combout     Out     0.099     2.991       -         
+un10_rd_addr_t_1_CO0                                       Net                                              -           -       0.512     -           5         
+input_fifo_inst.un10_rd_addr_t_1_SUM[1]                    cyclonev_lcell_comb                              dataf       In      -         3.504       -         
+input_fifo_inst.un10_rd_addr_t_1_SUM[1]                    cyclonev_lcell_comb                              combout     Out     0.099     3.603       -         
+un10_rd_addr_t_1_SUM_combout[1]                            Net                                              -           -       0.780     -           51        
+input_fifo_inst.fifo_buf.addrreg_RNIA5N8[0]                cyclonev_lcell_comb                              dataf       In      -         4.383       -         
+input_fifo_inst.fifo_buf.addrreg_RNIA5N8[0]                cyclonev_lcell_comb                              combout     Out     0.099     4.482       -         
+G_2_1                                                      Net                                              -           -       0.298     -           1         
+input_fifo_inst.fifo_buf.addrreg_RNIEN8C[2]                cyclonev_lcell_comb                              dataf       In      -         4.780       -         
+input_fifo_inst.fifo_buf.addrreg_RNIEN8C[2]                cyclonev_lcell_comb                              combout     Out     0.099     4.879       -         
+G_2_3                                                      Net                                              -           -       0.298     -           1         
+input_fifo_inst.fifo_buf.addrreg_RNIQHQF[4]                cyclonev_lcell_comb                              dataf       In      -         5.177       -         
+input_fifo_inst.fifo_buf.addrreg_RNIQHQF[4]                cyclonev_lcell_comb                              combout     Out     0.099     5.276       -         
+addrreg_RNIQHQF_combout[4]                                 Net                                              -           -       0.698     -           24        
+input_fifo_inst.fifo_buf.datareg_RNI1IS11[9]               cyclonev_lcell_comb                              dataf       In      -         5.974       -         
+input_fifo_inst.fifo_buf.datareg_RNI1IS11[9]               cyclonev_lcell_comb                              combout     Out     0.099     6.073       -         
+fifo_buf_9                                                 Net                                              -           -       0.298     -           1         
+grayscale_inst.state_comb\.un7_n_grayscale_pixel[15:0]     lanedetect_top_cyclonev_mac_Um27x27_8_8_16_1     ax[1]       In      -         6.371       -         
+================================================================================================================================================================
+Total path delay (propagation time + ICD at startpoint + setup) of 8.205 is 3.878(47.3%) logic and 4.327(52.7%) route.
+Path delay compensated for clock skew. Clock skew is added to clock-to-out value, and is subtracted from setup time value
+*Arrival time includes intrinsic clock delay at start point and clock delay at startpoint
+
+
+
+##### END OF TIMING REPORT #####]
+
+Timing exceptions that could not be applied
+None
+
+Finished final timing analysis (Real Time elapsed 0h:00m:01s; CPU Time elapsed 0h:00m:01s; Memory used current: 122MB peak: 126MB)
+
+
+Finished timing report (Real Time elapsed 0h:00m:01s; CPU Time elapsed 0h:00m:01s; Memory used current: 122MB peak: 126MB)
+
+##### START OF AREA REPORT #####[
+Design view:work.lanedetect_top(rtl)
+Selecting part 5CSEBA6U23I7
+@N: FA174 |The following device usage report estimates place and route data. Please look at the place and route report for final resource usage.
+
+Total combinational functions 96 of 83820 ( 0%)
+ALUT usage by number of inputs
+		  7 input functions 	 0
+		  6 input functions 	 1
+		  5 input functions 	 42
+		  4 input functions 	 23
+		  <=3 input functions 	 30
+ALUTs by mode
+		  normal mode            96
+		  extended LUT mode      0
+		  arithmetic mode        0
+		  shared arithmetic mode 0
+Total registers 63 of 167640 ( 0%)
+Total Estimated Packed ALMs 55 of 41910 ( 0%)
+I/O pins 38 of 497 ( 8%), total I/O based on largest package of this part.
+
+Number of I/O registers
+			Input DDRs    :0
+			Output DDRs   :0
+
+DSP.M18X18_SUMOF2: 1
+DSP.M27X27: 1
+DSP Blocks:     2 
+ShiftTap:       0  (0 registers)
+Ena:             0
+Sload:           0
+Sclr:            0
+M10Ks:           0  (0% of 553)
+Memory ALUTs:   32  (0% of 20955)
+Total ESB:      2048 bits 
+
+##### END OF AREA REPORT #####]
+
+Mapper successful!
+
+At Mapper Exit (Real Time elapsed 0h:00m:01s; CPU Time elapsed 0h:00m:01s; Memory used current: 27MB peak: 126MB)
+
+Process took 0h:00m:01s realtime, 0h:00m:01s cputime
+# Mon Apr 14 13:05:52 2025
+
+###########################################################]

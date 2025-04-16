@@ -1,0 +1,12 @@
+@N:: Applying property .distcompmodetop with value 1 on module fifo in library work
+@N:: Applying property .distcompnoprune with value 1 on module fifo in library work
+@N:: Applying property .noprune with value 1 on module fifo in library work
+@N: CG364 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":2:7:2:10|Synthesizing module fifo in library work.
+Running optimization stage 1 on fifo .......
+@N: CL134 :"/home/nmh6120/ce387/CE392/rtl/fifo.sv":35:4:35:12|Found RAM fifo_buf, depth=64, width=24
+Running optimization stage 2 on fifo .......
+
+For a summary of runtime and memory usage per design unit, please see file:
+==========================================================
+@L: /home/nmh6120/ce387/CE392/syn/rev_2/synwork//distcomp/distcomp0/distcomp0.rt.csv
+

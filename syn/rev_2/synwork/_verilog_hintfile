@@ -1,0 +1,42 @@
+%%% protect protected_file
+#OPTIONS:"|-autotop|-bldtbl|-prodtype|synplify_premier|-pqdpadd|-verification_mode|0|-infer_seqShift|-primux|-fixsmult|-dspmac|-nram|-divnmod|-continue_on_error|-nostructver|-encrypt|-pro|-distcompmode|-noobf|-lite|-proto|-ui|-fid2|-ram|-sharing|on|-ll|2000|-autosm|-ignore_undefined_lib|-fast_synthesis|0|-lib|work|-lib|work"
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/linux_a_64/c_vhdl":1543382462
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/location.map":1543441258
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/std.vhd":1543382268
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/snps_haps_pkg.vhd":1543382268
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/std1164.vhd":1543382268
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/numeric.vhd":1543382268
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/umr_capim.vhd":1543382268
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/arith.vhd":1543382268
+#CUR:"/vol/synopsys/fpga/O-2018.09-SP1/lib/vhd/unsigned.vhd":1543382268
+#CUR:"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":1744647094
+#CUR:"/home/nmh6120/ce387/CE392/rtl/lanedetect_top.vhd":1744653920
+@E8lFkRDCDCNM8CC0O00_FDb
+HNLssI$RF
+s	bNNslCC0s_RowmQw_wAzw_ )1 QZR0HMCsoC
+sbNN0lCCosR_7WQaH]RMo0CCbs
+NlsNCs0CR]o_ ]QtaMRH0CCosM
+HbRk0Hp_Bi4R-
+bHMkH0R_a)1R
+-4HkMb0_RHu QXp4R-
+0FkbRk0Fz_wp-pR4M
+HbRk0H)_W_R h-F4
+kk0b0_RFu QXp4R-
+0FkbRk0Fv_ uRaY-H4
+M0bkR)H_7h_ R
+-4ClM8FD8kCF
+l8CkDRNos$N#ODDC
+HNLssI$RF
+s	bNNslCC0s_Ro]t Q]HaRMo0CCbs
+NlsNCs0CRWo_Q]7aR0HMCsoC
+bHMkH0R_iBpR
+-4HkMb0_RH)R1a-H4
+M0bkRuH_QpX R
+-4HkMb0_RH avuY4R-
+0FkbRk0F7_)_R h-F4
+kk0b0_RFu QXp4R-
+bHMkH0R_pwzp4R-
+0FkbRk0F)_W_R h-C4
+MF8l8CkD
+
+@ 

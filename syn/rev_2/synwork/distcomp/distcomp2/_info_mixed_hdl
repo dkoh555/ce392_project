@@ -1,0 +1,8 @@
+|work.fifo|parameter FIFO_DATA_WIDTH 24;,parameter FIFO_BUFFER_SIZE 64;|
+|work.fifo|parameter FIFO_DATA_WIDTH 8;,parameter FIFO_BUFFER_SIZE 64;|
+|work.fifo|parameter FIFO_DATA_WIDTH 24;,parameter FIFO_BUFFER_SIZE 64;|
+|work.fifo|parameter FIFO_DATA_WIDTH 8;,parameter FIFO_BUFFER_SIZE 64;|
+|work.fifo|parameter FIFO_DATA_WIDTH 24;,parameter FIFO_BUFFER_SIZE 64;|
+|work.fifo|parameter FIFO_DATA_WIDTH 8;,parameter FIFO_BUFFER_SIZE 64;|
+|work.fifo|parameter FIFO_DATA_WIDTH 24;,parameter FIFO_BUFFER_SIZE 64;|
+|work.fifo|parameter FIFO_DATA_WIDTH 8;,parameter FIFO_BUFFER_SIZE 64;|

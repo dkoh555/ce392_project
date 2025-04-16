@@ -1,0 +1,243 @@
+
+                             Synplify (R) Premier 
+
+                Version O-2018.09-SP1 for RHEL64 - Nov 27, 2018 
+
+                    Copyright (c) 1988 - 2018 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+            or distribution of this software is strictly prohibited.
+
+Starting:    /vol/synopsys/fpga/O-2018.09-SP1/linux_a_64/mbin/synplify
+Install:     /vol/synopsys/fpga/O-2018.09-SP1
+Hostname:    joker.ece.northwestern.edu
+Date:        Mon Apr 14 11:08:10 2025
+Version:     O-2018.09-SP1
+
+Arguments:   -product synplify_premier
+ProductType: synplify_premier
+
+License checkout: synplifypremierdp
+License: synplifypremierdp from server synopsyslm.ece.northwestern.edu (Using premium license)
+Licensed Vendor: All FPGA
+License Option: ident
+
+
+
+/home/nmh6120/ce387/final_proj/syn/proj_1.prjlog file: "/home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr"
+Running: rev_2 in foreground
+
+Running lanedetect|rev_2
+
+Running Flow: compile (Compile) on lanedetect|rev_2
+# Mon Apr 14 11:09:30 2025
+
+Running Flow: compile_flow (Compile Process) on lanedetect|rev_2
+# Mon Apr 14 11:09:30 2025
+License granted for 4 parallel jobs
+
+Running: compiler (Compile Input) on lanedetect|rev_2
+# Mon Apr 14 11:09:30 2025
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_comp.srs to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srs
+compiler exited with errors
+Job failed on: lanedetect|rev_2
+
+Job: "compiler" terminated with error status: 2
+See log file: "/home/nmh6120/ce387/CE392/syn/rev_2/synlog/lanedetect_top_compiler.srr"
+# Mon Apr 14 11:09:34 2025
+
+Return Code: 2
+Run Time:00h:00m:04s
+Complete: Compile Process on lanedetect|rev_2
+Complete: Compile on lanedetect|rev_2
+Complete: Logic Synthesis on lanedetect|rev_2
+0Opening object source file /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr to /home/nmh6120/ce387/CE392/syn/rev_2/backup/lanedetect_top.srr
+log file: "/home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr"
+Running: rev_2 in foreground
+
+Running lanedetect|rev_2
+
+Running Flow: compile (Compile) on lanedetect|rev_2
+# Mon Apr 14 11:11:08 2025
+
+Running Flow: compile_flow (Compile Process) on lanedetect|rev_2
+# Mon Apr 14 11:11:08 2025
+License granted for 4 parallel jobs
+
+Running: compiler (Compile Input) on lanedetect|rev_2
+# Mon Apr 14 11:11:08 2025
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_comp.srs to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srs
+compiler exited with errors
+Job failed on: lanedetect|rev_2
+
+Job: "compiler" terminated with error status: 2
+See log file: "/home/nmh6120/ce387/CE392/syn/rev_2/synlog/lanedetect_top_compiler.srr"
+# Mon Apr 14 11:11:13 2025
+
+Return Code: 2
+Run Time:00h:00m:05s
+Complete: Compile Process on lanedetect|rev_2
+Complete: Compile on lanedetect|rev_2
+Complete: Logic Synthesis on lanedetect|rev_2
+0Opening object source file /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr
+log file: "/home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr"
+Running: rev_2 in foreground
+
+Running lanedetect|rev_2
+
+Running Flow: compile (Compile) on lanedetect|rev_2
+# Mon Apr 14 11:13:13 2025
+
+Running Flow: compile_flow (Compile Process) on lanedetect|rev_2
+# Mon Apr 14 11:13:13 2025
+License granted for 4 parallel jobs
+
+Running: compiler (Compile Input) on lanedetect|rev_2
+# Mon Apr 14 11:13:13 2025
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_comp.srs to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srs
+
+compiler completed
+# Mon Apr 14 11:13:18 2025
+
+Return Code: 0
+Run Time:00h:00m:05s
+
+Running: multi_srs_gen (Multi-srs Generator) on lanedetect|rev_2
+# Mon Apr 14 11:13:18 2025
+
+multi_srs_gen completed
+# Mon Apr 14 11:13:18 2025
+
+Return Code: 0
+Run Time:00h:00m:00s
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_mult.srs to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srs
+Complete: Compile Process on lanedetect|rev_2
+
+Running: premap (Premap) on lanedetect|rev_2
+# Mon Apr 14 11:13:18 2025
+premap exited with errors
+Job failed on: lanedetect|rev_2
+
+Job: "premap" terminated with error status: 2
+See log file: "/home/nmh6120/ce387/CE392/syn/rev_2/synlog/lanedetect_top_premap.srr"
+# Mon Apr 14 11:13:18 2025
+
+Return Code: 2
+Run Time:00h:00m:00s
+Complete: Compile on lanedetect|rev_2
+Complete: Logic Synthesis on lanedetect|rev_2
+2Opening object source file /home/nmh6120/ce387/CE392/rtl/lanedetect_top.vhd
+Opening object source file /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr
+log file: "/home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr"
+Running: rev_2 in foreground
+
+Running lanedetect|rev_2
+
+Running Flow: compile (Compile) on lanedetect|rev_2
+# Mon Apr 14 13:05:29 2025
+
+Running Flow: compile_flow (Compile Process) on lanedetect|rev_2
+# Mon Apr 14 13:05:29 2025
+License granted for 4 parallel jobs
+
+Running: compiler (Compile Input) on lanedetect|rev_2
+# Mon Apr 14 13:05:29 2025
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_comp.srs to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srs
+
+compiler completed
+# Mon Apr 14 13:05:33 2025
+
+Return Code: 0
+Run Time:00h:00m:04s
+
+Running: multi_srs_gen (Multi-srs Generator) on lanedetect|rev_2
+# Mon Apr 14 13:05:33 2025
+
+multi_srs_gen completed
+# Mon Apr 14 13:05:33 2025
+
+Return Code: 0
+Run Time:00h:00m:00s
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_mult.srs to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srs
+Complete: Compile Process on lanedetect|rev_2
+
+Running: premap (Premap) on lanedetect|rev_2
+# Mon Apr 14 13:05:33 2025
+
+premap completed with warnings
+# Mon Apr 14 13:05:34 2025
+
+Return Code: 1
+Run Time:00h:00m:01s
+Complete: Compile on lanedetect|rev_2
+
+Running Flow: map (Map) on lanedetect|rev_2
+# Mon Apr 14 13:05:34 2025
+License granted for 4 parallel jobs
+
+Running: fpga_mapper (Map & Optimize) on lanedetect|rev_2
+# Mon Apr 14 13:05:34 2025
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_m.srm to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srm
+
+fpga_mapper completed with warnings
+# Mon Apr 14 13:05:36 2025
+
+Return Code: 1
+Run Time:00h:00m:02s
+Complete: Map on lanedetect|rev_2
+Complete: Logic Synthesis on lanedetect|rev_2
+0log file: "/home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srr"
+Running: rev_2 in foreground
+
+Running lanedetect|rev_2
+
+Running Flow: compile (Compile) on lanedetect|rev_2
+# Mon Apr 14 13:05:46 2025
+
+Running Flow: compile_flow (Compile Process) on lanedetect|rev_2
+# Mon Apr 14 13:05:46 2025
+License granted for 4 parallel jobs
+
+Running: compiler (Compile Input) on lanedetect|rev_2
+# Mon Apr 14 13:05:46 2025
+
+compiler completed
+# Mon Apr 14 13:05:50 2025
+
+Return Code: 0
+Run Time:00h:00m:04s
+
+Running: multi_srs_gen (Multi-srs Generator) on lanedetect|rev_2
+# Mon Apr 14 13:05:50 2025
+Up-To-Date: multi_srs_gen. No run necessary
+Complete: Compile Process on lanedetect|rev_2
+
+Running: premap (Premap) on lanedetect|rev_2
+# Mon Apr 14 13:05:50 2025
+
+premap completed with warnings
+# Mon Apr 14 13:05:50 2025
+
+Return Code: 1
+Run Time:00h:00m:00s
+Complete: Compile on lanedetect|rev_2
+
+Running Flow: map (Map) on lanedetect|rev_2
+# Mon Apr 14 13:05:50 2025
+License granted for 4 parallel jobs
+
+Running: fpga_mapper (Map & Optimize) on lanedetect|rev_2
+# Mon Apr 14 13:05:50 2025
+Copied /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_m.srm to /home/nmh6120/ce387/CE392/syn/rev_2/lanedetect_top.srm
+
+fpga_mapper completed with warnings
+# Mon Apr 14 13:05:52 2025
+
+Return Code: 1
+Run Time:00h:00m:02s
+Complete: Map on lanedetect|rev_2
+Complete: Logic Synthesis on lanedetect|rev_2
+0exit status=0
+License checkin: synplifypremierdp

@@ -1,0 +1,2 @@
+@E: CD648 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:12:45:16|Expression does not match type boolean
+
