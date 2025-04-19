@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 
 #define high_threshold 48
@@ -40,6 +42,112 @@ struct pixel {
     unsigned char r;
 };
 
+int create_directories(const char *filepath) {
+    /**
+     * @brief Creates all directories in a filepath if they don't exist.
+     * 
+     * For example, given "images/outputs/test2", it will create
+     * "images" and "images/outputs" directories if they don't exist.
+     * 
+     * @param filepath The directory path to create
+     * @return 0 on success, -1 on failure
+     */
+
+    // Copy the path to avoid modifying the original
+    char *path_copy = strdup(filepath);
+    if (!path_copy) {
+        return -1;  // Memory allocation failed
+    }
+    
+    // Create a buffer for building the path incrementally
+    char *buffer = malloc(strlen(filepath) + 1);
+    if (!buffer) {
+        free(path_copy);
+        return -1;
+    }
+    buffer[0] = '\0';
+    
+    // Handle absolute paths
+    if (filepath[0] == '/') {
+        strcpy(buffer, "/");
+    }
+    
+    // Parse each directory in the path
+    char *token = strtok(path_copy, "/");
+    while (token != NULL) {
+        // Append this directory to our path
+        strcat(buffer, token);
+        
+        // Create this directory if it doesn't exist
+        struct stat st;
+        if (stat(buffer, &st) != 0) {
+            // Directory doesn't exist, create it
+            if (mkdir(buffer, 0755) != 0 && errno != EEXIST) {
+                // Failed to create directory
+                free(buffer);
+                free(path_copy);
+                return -1;
+            }
+        } else if (!S_ISDIR(st.st_mode)) {
+            // Path exists but is not a directory
+            free(buffer);
+            free(path_copy);
+            return -1;
+        }
+        
+        // Add slash for next directory
+        strcat(buffer, "/");
+        token = strtok(NULL, "/");
+    }
+    
+    free(buffer);
+    free(path_copy);
+    return 0;
+}
+
+char *create_output_path(const char *input_path, char *output_path) {
+    /**
+     * Creates an output directory path from an input filepath.
+     *
+     * @param input_path   The original filepath (e.g., "images/test2.bmp")
+     * @param output_path  Buffer where the output path will be stored
+     * @return A pointer to the output path
+    */
+
+    const char *last_slash = strrchr(input_path, '/');
+    const char *filename;
+    int dir_length = 0;
+    
+    // Extract the directory part (if any)
+    if (last_slash != NULL) {
+        dir_length = last_slash - input_path + 1; // Include the slash
+        strncpy(output_path, input_path, dir_length);
+        output_path[dir_length] = '\0';
+        filename = last_slash + 1;
+    } else {
+        // No directory in the path
+        output_path[0] = '\0';
+        filename = input_path;
+    }
+    
+    // Add "out/" directory
+    strcat(output_path, "out/");
+    
+    // Extract and add the filename without extension
+    const char *extension = strrchr(filename, '.');
+    if (extension != NULL) {
+        int name_length = extension - filename;
+        strncat(output_path, filename, name_length);
+    } else {
+        // No extension found, use the whole filename
+        strcat(output_path, filename);
+    }
+    
+    // Add trailing slash
+    strcat(output_path, "/");
+    
+    return output_path;
+}
 
 int read_bmp(FILE *f, unsigned char* header, int *height, int *width, struct pixel* data) {
 /**
@@ -135,6 +243,14 @@ void write_bmp(const char *filename, const unsigned char *header, const unsigned
     fclose(file);
 }
 
+void save_result(const char *filepath, char *filename, const unsigned char *header, const unsigned char *data) {
+    char *final_filepath = malloc(strlen(filepath) + strlen(filename) + 1);
+    strcpy(final_filepath, filepath);
+    strcat(final_filepath, filename);
+    write_bmp(final_filepath, header, data);
+    free(final_filepath);
+}
+
 int convert_to_grayscale(struct pixel * data, int height, int width, unsigned char *grayscale_data) {
 /**
     * @brief Converts an RGB image to grayscale.
@@ -163,8 +279,8 @@ int convert_to_grayscale(struct pixel * data, int height, int width, unsigned ch
             150 * data[i].g + 
             30 * data[i].b
         ) >> 8);
-        if (i < 3)
-            printf("Pixel %3d: %02x %02x %02x  ->  %02x\n", i, data[i].r, data[i].g, data[i].b, grayscale_data[i]);
+        // if (i < 3)
+            // printf("Pixel %3d: %02x %02x %02x  ->  %02x\n", i, data[i].r, data[i].g, data[i].b, grayscale_data[i]);
     }
     return 0;
 }
@@ -201,7 +317,7 @@ void gaussian_blur(unsigned char *in_data, int height, int width, unsigned char 
             // If edge pixel (either on edge or one away from edge), just copy from original
             if (x < 2 || x >= width - 2 || y < 2 || y >= height - 2) {
                 out_data[y * width + x] = in_data[y * width + x];
-                if (y == 0 && x < 10) printf("Pixel %d: %x\n", y * width + x, in_data[y * width + x]);
+                // if (y == 0 && x < 10) printf("Pixel %d: %x\n", y * width + x, in_data[y * width + x]);
             } else {
                 // Convolution over 5x5 window
                 for (j = -2; j <= 2; j++) {
@@ -216,13 +332,12 @@ void gaussian_blur(unsigned char *in_data, int height, int width, unsigned char 
                     }
                 }
                 out_data[y * width + x] = numerator / denominator;
-                if (y == 0 && x < 10) printf("Pixel %d: %x\n", y * width + x, numerator / denominator);
+                // if (y == 0 && x < 10) printf("Pixel %d: %x\n", y * width + x, numerator / denominator);
             }
 
         }
     }
 }
-
 
 void sobel(unsigned char in_data[3][3], unsigned char *out_data) {
 /**
@@ -568,7 +683,6 @@ void extract_top_lines(unsigned char *in_data, int height, int width, const unsi
     }
 }
 
-
 float calculate_center_lane(const int *rho_indices, const int *theta_indices, const int *vote_counts) {
 /**
     * @brief Computes steering correction from top-N Hough peaks.
@@ -623,7 +737,7 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
     float left_x  = left_rho / cos_l;
     float right_x = right_rho / cos_r;
 
-    printf("left_x: %d, right_x: %d\n", left_x, right_x);
+    // printf("left_x: %d, right_x: %d\n", left_x, right_x);
 
     // Estimate lane center and offset
     float lane_center = (left_x + right_x) * 0.5f;
@@ -640,8 +754,22 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
 
 int main(int argc, char *argv[]) {
     
-    if (argc != 3) {
-        printf("Usage: %s <input_image.bmp> <output_image.bmp>\n", argv[0]);
+    if (argc != 2) {
+        printf("Usage: %s <input_image.bmp>\n", argv[0]);
+        return 1;
+    }
+
+    printf("Filename: %s\n", argv[1]);
+
+    // Create output directory
+    char *output_filepath = malloc(strlen(argv[1]) + strlen("/out/"));
+    create_output_path(argv[1], output_filepath);
+    printf("Output filepath: %s\n", output_filepath);
+
+    int creation_res = create_directories(output_filepath);
+    if (creation_res != 0) {
+        printf("Failed to create directories for output file\n");
+        free(output_filepath);
         return 1;
     }
 
@@ -679,14 +807,19 @@ int main(int argc, char *argv[]) {
     // non_maximum_suppressor(edges, height, width, nms);
     hysteresis_filter(edges, height, width, thresholded);
     region_of_interest(thresholded, height, width, roi);
-    hough_transform(roi, height, width, accumulator);
-    extract_top_lines(roi, height, width, accumulator, rho_indices, theta_indices, vote_counts);
-    float steering = calculate_center_lane(rho_indices, theta_indices, vote_counts); // roi, height, width, 255);
+    // hough_transform(roi, height, width, accumulator);
+    // extract_top_lines(roi, height, width, accumulator, rho_indices, theta_indices, vote_counts);
+    // float steering = calculate_center_lane(rho_indices, theta_indices, vote_counts); // roi, height, width, 255);
     // printf("Steering correction: %.2f\n", steering);
 
-    write_bmp(argv[2], header, blurred);
-
-
+    // Save the output images
+    save_result(output_filepath, "grayscale.bmp", header, grayscale);
+    save_result(output_filepath, "blurred.bmp", header, blurred);
+    save_result(output_filepath, "edges.bmp", header, edges);
+    // save_result(output_filepath, "nms.bmp", header, nms);
+    save_result(output_filepath, "thresholded.bmp", header, thresholded);
+    save_result(output_filepath, "roi.bmp", header, roi);
+    // save_result(output_filepath, "accumulator.bmp", header, accumulator);
 
     // Cleanup
     free(rgb_data);
@@ -697,6 +830,7 @@ int main(int argc, char *argv[]) {
     free(thresholded);
     free(roi);
     free(accumulator);
+    free(output_filepath);
 
     return 0;
 }
