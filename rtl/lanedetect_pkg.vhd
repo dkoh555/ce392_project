@@ -12,6 +12,18 @@ package lanedetect_pkg is
         ( 4, 16, 24, 16, 4 ),
         ( 1,  4,  6,  4, 1 )
     );
+
+    type sobel_t is array (2 downto 0, 2 downto 0) of integer;
+    constant SOBEL_H_KERNEL : sobel_t := (
+        ( -1,  0,  1 ),
+        ( -2,  0,  2 ),
+        ( -1,  0,  1 )
+    );
+    constant SOBEL_V_KERNEL : sobel_t := (
+        ( -1,  -2,  -1 ),
+        (  0,   0,   0 ),
+        (  1,   2,   1 )
+    );
     
 end package lanedetect_pkg;
 

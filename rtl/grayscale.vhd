@@ -56,15 +56,14 @@ begin
 
     end process state_seq;
 
-    state_comb : process (q_state, i_PIXEL, w_pixel_red, w_pixel_green, w_pixel_blue, i_EMPTY, i_FULL) begin
+    state_comb : process (q_state, i_PIXEL, w_pixel_red, w_pixel_green, w_pixel_blue, q_grayscale_pixel, i_EMPTY, i_FULL) begin
 
         -- Get color values
         w_pixel_blue <= unsigned(i_PIXEL(23 downto 16));
         w_pixel_green <= unsigned(i_PIXEL(15 downto 8));
         w_pixel_red <= unsigned(i_PIXEL(7 downto 0));
 
-        -- Always set grayscale pixel to reduce combinational logic
-        n_grayscale_pixel <= std_logic_vector(w_pixel_red * to_unsigned(76, 8) + w_pixel_green * to_unsigned(150, 8) + w_pixel_blue * to_unsigned(30, 8));
+        n_grayscale_pixel <= q_grayscale_pixel;
         n_state <= q_state;
         o_RD_EN <= '0';
         o_WR_EN <= '0';
@@ -73,6 +72,7 @@ begin
         
             when s_READ =>
                 if (i_EMPTY = '0') then
+                    n_grayscale_pixel <= std_logic_vector(w_pixel_red * to_unsigned(76, 8) + w_pixel_green * to_unsigned(150, 8) + w_pixel_blue * to_unsigned(30, 8));
                     n_state <= s_WRITE;
                     o_RD_EN <= '1';
                 end if;
