@@ -5,12 +5,15 @@ vmap work work
 
 # rtl files
 vlog -work work "../rtl/fifo.sv"
-vcom -2008 -work work ../rtl/lanedetect_pkg.vhd
-vcom -2008 -work work ../rtl/grayscale.vhd
-vcom -2008 -work work ../rtl/gaussian_blur.vhd
-vcom -2008 -work work ../rtl/sobel.vhd
-vcom -2008 -work work ../rtl/non_max_suppression.vhd
-vcom -2008 -work work ../rtl/lanedetect_top.vhd
+vcom -2008 -work work "../rtl/roi.vhd"
+vcom -2008 -work work "../rtl/lanedetect_pkg.vhd"
+vcom -2008 -work work "../rtl/grayscale.vhd"
+vcom -2008 -work work "../rtl/gaussian_blur.vhd"
+vcom -2008 -work work "../rtl/sobel.vhd"
+vcom -2008 -work work "../rtl/non_max_suppression.vhd"
+vcom -2008 -work work "../rtl/hysteresis.vhd"
+vcom -2008 -work work "../rtl/roi.vhd"
+vcom -2008 -work work "../rtl/lanedetect_top.vhd"
 
 # uvm library
 vlog -work work +incdir+$env(UVM_HOME)/src $env(UVM_HOME)/src/uvm.sv
