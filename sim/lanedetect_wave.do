@@ -1,3 +1,5 @@
+config wave -signalnamewidth 1
+
 add wave -noupdate -group lanedetect_top_inst
 add wave -noupdate -group lanedetect_top_inst -radix hexadecimal /my_uvm_tb/lanedetect_top_inst/*
 
