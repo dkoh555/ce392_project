@@ -5,6 +5,7 @@ vmap work work
 
 # rtl files
 vlog -work work "../rtl/fifo.sv"
+vlog -work work "../rtl/bram.sv"
 vcom -2008 -work work "../rtl/roi.vhd"
 vcom -2008 -work work "../rtl/lanedetect_pkg.vhd"
 vcom -2008 -work work "../rtl/grayscale.vhd"
@@ -13,6 +14,8 @@ vcom -2008 -work work "../rtl/sobel.vhd"
 vcom -2008 -work work "../rtl/non_max_suppression.vhd"
 vcom -2008 -work work "../rtl/hysteresis.vhd"
 vcom -2008 -work work "../rtl/roi.vhd"
+vcom -2008 -work work "../rtl/hough.vhd"
+vcom -2008 -work work "../rtl/center_lane.vhd"
 vcom -2008 -work work "../rtl/lanedetect_top.vhd"
 
 # uvm library

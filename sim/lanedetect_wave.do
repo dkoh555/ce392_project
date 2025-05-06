@@ -22,5 +22,8 @@ add wave -noupdate -group hysteresis_inst -radix hexadecimal  /my_uvm_tb/lanedet
 add wave -noupdate -group roi_inst
 add wave -noupdate -group roi_inst -radix hexadecimal  /my_uvm_tb/lanedetect_top_inst/roi_inst/*
 
-#add wave -noupdate -group hough_inst
-#add wave -noupdate -group hough_inst -radix hexadecimal  /my_uvm_tb/lanedetect_top_inst/hough_inst/*
+add wave -noupdate -group hough_inst
+add wave -noupdate -group hough_inst -radix hexadecimal  /my_uvm_tb/lanedetect_top_inst/hough_inst/*
+
+add wave -noupdate -group center_lane_inst
+add wave -noupdate -group center_lane_inst -radix hexadecimal  /my_uvm_tb/lanedetect_top_inst/center_lane_inst/*
