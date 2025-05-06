@@ -254,6 +254,55 @@ void save_result(const char *filepath, char *filename, const unsigned char *head
     free(final_filepath);
 }
 
+void write_color_bmp(const char *filename, const unsigned char *header, const struct pixel *rgb_data) {
+/**
+    * @brief Writes a color RGB image to disk as a 24-bit BMP file.
+    *
+    * Writes the RGB image data directly to a BMP file without any conversion,
+    * since the input data is already in the correct RGB format.
+    *
+    * @param filename  Name of the output BMP file.
+    * @param header    Pointer to the 54-byte BMP header.
+    * @param rgb_data  Pointer to RGB image data (array of struct pixel).
+*/
+    // Open file for writing in binary mode
+    FILE *file = fopen(filename, "wb");
+    if (!file) {
+        fprintf(stderr, "Error: Could not open file %s for writing.\n", filename);
+        return;
+    }
+
+    // Extract width and height from BMP header
+    int w = *(int *)&header[18];
+    int h = *(int *)&header[22];
+    int size = w * h;
+
+    // Write BMP header and pixel data to file
+    fwrite(header, sizeof(unsigned char), 54, file);
+    fwrite(rgb_data, sizeof(struct pixel), size, file);
+
+    // Clean up
+    fclose(file);
+}
+
+void save_color_result(const char *filepath, char *filename, const unsigned char *header, const struct pixel *rgb_data) {
+/**
+    * @brief Creates a full filepath and saves color RGB image data using write_color_bmp.
+    *
+    * Combines the directory path and filename, then calls write_color_bmp to save the RGB image.
+    *
+    * @param filepath  Directory path where the file should be saved.
+    * @param filename  Name of the output file.
+    * @param header    Pointer to the 54-byte BMP header.
+    * @param rgb_data  Pointer to RGB image data (array of struct pixel).
+*/
+    char *final_filepath = malloc(strlen(filepath) + strlen(filename) + 1);
+    strcpy(final_filepath, filepath);
+    strcat(final_filepath, filename);
+    write_color_bmp(final_filepath, header, rgb_data);
+    free(final_filepath);
+}
+
 int convert_to_grayscale(struct pixel * data, int height, int width, unsigned char *grayscale_data) {
 /**
     * @brief Converts an RGB image to grayscale.
@@ -695,6 +744,73 @@ void extract_top_lines(unsigned char *in_data, int height, int width, const unsi
     }
 }
 
+void overlay_og_img(struct pixel *rgb_data, int height, int width, const int *rho_indices, const int *theta_indices, const int *vote_counts) {
+/**
+    * @brief Overlays detected lines on the original RGB image.
+    *
+    * Draws red lines on the input RGB image corresponding to the lines
+    * detected by the Hough transform.
+    *
+    * @param rgb_data       Pointer to the original RGB image data.
+    * @param height         Height of the image.
+    * @param width          Width of the image.
+    * @param rho_indices    Array of rho indices from extract_top_lines.
+    * @param theta_indices  Array of theta indices from extract_top_lines.
+    * @param vote_counts    Array of vote counts from extract_top_lines.
+*/
+    
+    // Process each detected line
+    for (int i = 0; i < TOP_N; i++) {
+        // Skip lines with minimal votes
+        if (vote_counts[i] < 10) {
+            continue;
+        }
+        
+        // Convert indices to actual values
+        float rho = (rho_indices[i] - RHOS / 2) * RHO_RESOLUTION;
+        float cos_t = cosvals[theta_indices[i]];
+        float sin_t = sinvals[theta_indices[i]];
+        
+        // Calculate line origin point in centered coordinates
+        float x0 = cos_t * rho;
+        float y0 = sin_t * rho;
+        
+        // Calculate line direction vector (perpendicular to normal)
+        float dx = -sin_t;
+        float dy = cos_t;
+        
+        // Compute two endpoints (in image coordinates)
+        int x1 = (int)(x0 + 1000 * dx + width / 2);
+        int y1 = (int)(y0 + 1000 * dy + height / 2);
+        int x2 = (int)(x0 - 1000 * dx + width / 2);
+        int y2 = (int)(y0 - 1000 * dy + height / 2);
+        
+        // Bresenham's line algorithm for drawing
+        int dx_draw = abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+        int dy_draw = -abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
+        int err = dx_draw + dy_draw;
+        
+        while (1) {
+            // If point is within image bounds, color it red
+            if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height) {
+                int idx = y1 * width + x1;
+                // Set pixel to red (R=255, G=0, B=0)
+                rgb_data[idx].r = 255;
+                rgb_data[idx].g = 0;
+                rgb_data[idx].b = 0;
+            }
+            
+            // Break once we've reached the endpoint
+            if (x1 == x2 && y1 == y2) break;
+            
+            // Update coordinates
+            int e2 = 2 * err;
+            if (e2 >= dy_draw) { err += dy_draw; x1 += sx; }
+            if (e2 <= dx_draw) { err += dx_draw; y1 += sy; }
+        }
+    }
+}
+
 float calculate_center_lane(const int *rho_indices, const int *theta_indices, const int *vote_counts) {
 /**
     * @brief Computes steering correction from top-N Hough peaks.
@@ -816,7 +932,7 @@ int main(int argc, char *argv[]) {
     convert_to_grayscale(rgb_data, height, width, grayscale);
     gaussian_blur(grayscale, height, width, blurred);
     sobel_filter(blurred, height, width, edges);
-    // non_maximum_suppressor(edges, height, width, nms);
+    // non_maximum_suppressor(edges, height, width, nms); // WIP: Need to work on this (or it's done and only needs to be integrated?)
     hysteresis_filter(edges, height, width, thresholded);
     region_of_interest(thresholded, height, width, roi);
     hough_transform(roi, height, width, accumulator);
@@ -824,6 +940,7 @@ int main(int argc, char *argv[]) {
     save_result(output_filepath, "roi_raw.bmp", header, roi);
 
     extract_top_lines(roi, height, width, accumulator, rho_indices, theta_indices, vote_counts);
+    overlay_og_img(rgb_data, height, width, rho_indices, theta_indices, vote_counts);
     // float steering = calculate_center_lane(rho_indices, theta_indices, vote_counts); // roi, height, width, 255);
     // printf("Steering correction: %.2f\n", steering);
 
@@ -834,6 +951,7 @@ int main(int argc, char *argv[]) {
     // save_result(output_filepath, "nms.bmp", header, nms);
     save_result(output_filepath, "thresholded.bmp", header, thresholded);
     save_result(output_filepath, "roi.bmp", header, roi);
+    save_color_result(output_filepath, "overlay.bmp", header, rgb_data);
     // save_result(output_filepath, "accumulator.bmp", header, accumulator);
 
     // Cleanup
