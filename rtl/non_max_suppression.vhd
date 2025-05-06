@@ -34,6 +34,9 @@ architecture rtl of non_max_suppression is
     type t_pixel_lines is array (0 to 2) of t_pixel_line;    
     signal q_lines, n_lines : t_pixel_lines;
 
+    -- Current line
+    signal q_line_idx, n_line_idx : unsigned(2 downto 0);
+    
     -- 3x3 Sliding pixel window
     type t_pixel_window_line is array (0 to 2) of std_logic_vector(7 downto 0);
     type t_pixel_window is array (0 to 2) of t_pixel_window_line;
@@ -65,6 +68,7 @@ begin
             -- Pixel buffer and sliding window
             q_lines <= (others => (others => (others => '0')));
             q_window <= (others => (others => (others => '0')));
+            q_line_idx <= (others => '0');
             -- States
             q_state <= s_READ;
             -- Pixel arithmetic
@@ -77,6 +81,7 @@ begin
             -- Pixel buffer and sliding window
             q_lines <= n_lines;
             q_window <= n_window;
+            q_line_idx <= n_line_idx;
             -- States
             q_state <= n_state;
             -- Pixel arithmetic
@@ -89,11 +94,12 @@ begin
 
     end process state_seq;
 
-    state_comb : process (q_lines, q_state, q_col, q_row, q_window, q_calc_count, q_dir, i_PIXEL, i_EMPTY, n_lines, q_pixel, i_FULL) begin
+    state_comb : process (q_lines, q_state, q_col, q_row, q_window, q_calc_count, q_dir, i_PIXEL, i_EMPTY, n_lines, q_pixel, i_FULL, q_line_idx) begin
 
         -- Default signal assignment
         n_lines <= q_lines;
         n_window <= q_window;
+        n_line_idx <= q_line_idx;
         n_state <= q_state;
         n_col   <= q_col;
         n_row   <= q_row;
@@ -113,27 +119,34 @@ begin
         case (q_state) is
 
             when s_READ =>
+
+                -- If enough pixels have been buffered in towards the end of the image, stop reading
+                if (q_col > to_unsigned(g_WIDTH - 1, q_col'length) or q_row > to_unsigned(g_HEIGHT - 1, q_col'length)) then
+                    -- If end of line has been reached, increment current line index.
+                    if (q_col = to_unsigned(g_WIDTH, q_col'length)) then
+                        if (q_line_idx = to_unsigned(2, q_line_idx'length)) then
+                            n_line_idx <= (others => '0');
+                        else
+                            n_line_idx <= q_line_idx + to_unsigned(1, q_line_idx'length);
+                        end if;
+                    end if;                    
+                    -- Go to fetch state
+                    n_state <= s_FETCH;
+
                 -- If FIFO not empty or if remaining pixels need to be buffered out
-                if (i_EMPTY = '0' or (q_col > to_unsigned(g_WIDTH - 1, q_col'length) or q_row > to_unsigned(g_HEIGHT - 1, q_col'length))) then
+                elsif (i_EMPTY = '0') then
                     -- Implicit BRAM definition, store pixel in column location
                     if (q_col < to_unsigned(g_WIDTH, q_col'length)) then
-                        n_lines(0)(to_integer(q_col)) <= i_PIXEL;
+                        n_lines(to_integer(q_line_idx))(to_integer(q_col)) <= i_PIXEL;
                         o_RD_EN <= '1';
                     end if;
-
-                    -- If end of line has been reached, shift rows (line counter end is extended by 2 to account for edge pixels)
-                    if (q_col = to_unsigned(g_WIDTH, 10)) then
-                        for i in 0 to 1 loop
-                            n_lines(i + 1) <= q_lines(i);
-                        end loop;
-                    end if;
-
+                    -- Go to fetch state
                     n_state <= s_FETCH;
-                
+
                 end if;
 
             when s_FETCH =>
-                    
+                
                 -- Shift into sliding window
                 for r in 0 to 2 loop
                     -- Shift current pixels
@@ -145,7 +158,11 @@ begin
                         -- Most recent pixels go in position 0
                         n_window(r)(0) <= (others => '0');
                     else
-                        n_window(r)(0) <= n_lines(r)(to_integer(q_col));
+                        if (q_line_idx < to_unsigned(r, q_line_idx'length)) then
+                            n_window(r)(0) <= q_lines(3 + to_integer(q_line_idx) - r)(to_integer(q_col));
+                        else
+                            n_window(r)(0) <= q_lines(to_integer(q_line_idx) - r)(to_integer(q_col));
+                        end if;
                     end if;
                 end loop;
                 

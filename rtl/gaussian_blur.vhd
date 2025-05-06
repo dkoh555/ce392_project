@@ -33,9 +33,14 @@ end entity gaussian_blur;
 architecture rtl of gaussian_blur is
 
     -- 5 Line pixel buffer
-    type t_pixel_line is array (0 to g_WIDTH - 1) of std_logic_vector(7 downto 0);
+    type t_pixel_line is array (0 to g_WIDTH - 1) of std_logic_vector(7 downto 0); -- Longer than actually needed to save on logic
     type t_pixel_lines is array (0 to 4) of t_pixel_line;    
     signal q_lines, n_lines : t_pixel_lines;
+
+    -- Current line
+    signal q_line_idx, n_line_idx : unsigned(2 downto 0);
+    type t_pixel_shift is array (0 to 4) of std_logic_vector(7 downto 0);
+    signal q_shift_pixels, n_shift_pixels : t_pixel_shift;
 
     -- 5x5 Sliding pixel window
     type t_pixel_window_line is array (0 to 4) of std_logic_vector(7 downto 0);
@@ -43,7 +48,7 @@ architecture rtl of gaussian_blur is
     signal q_window, n_window : t_pixel_window;
 
     -- State signals
-    type t_state is (s_READ, s_FETCH, s_CALC, s_WRITE, s_SKIP);
+    type t_state is (s_READ, s_FETCH, s_CALC, s_WRITE);
     signal q_state, n_state : t_state;
 
     -- Hard coded width for row and column count
@@ -65,6 +70,8 @@ begin
             -- Pixel buffer and sliding window
             q_lines <= (others => (others => (others => '0')));
             q_window <= (others => (others => (others => '0')));
+            q_line_idx <= (others => '0');
+            q_shift_pixels <= (others => (others => '0'));
             -- States
             q_state <= s_READ;
             -- Pixel arithmetic
@@ -76,6 +83,8 @@ begin
             -- Pixel buffer and sliding window
             q_lines <= n_lines;
             q_window <= n_window;
+            q_line_idx <= n_line_idx;
+            q_shift_pixels <= n_shift_pixels;
             -- States
             q_state <= n_state;
             -- Pixel arithmetic
@@ -87,11 +96,13 @@ begin
 
     end process state_seq;
 
-    state_comb : process (q_lines, q_state, q_col, q_row, q_window, q_calc_count, q_sum, i_PIXEL, i_EMPTY, n_lines, w_tmp, i_FULL) begin
+    state_comb : process (q_lines, q_state, q_col, q_row, q_window, q_calc_count, q_sum, i_PIXEL, i_EMPTY, n_lines, w_tmp, i_FULL, q_line_idx, q_shift_pixels) begin
 
         -- Default signal assignment
         n_lines <= q_lines;
         n_window <= q_window;
+        n_line_idx <= q_line_idx;
+        n_shift_pixels <= q_shift_pixels;
         n_state <= q_state;
         n_col   <= q_col;
         n_row   <= q_row;
@@ -107,47 +118,63 @@ begin
         case (q_state) is
 
             when s_READ =>
+                -- If enough pixels have been buffered in towards the end of the image, stop reading
+                if (q_col > to_unsigned(g_WIDTH - 1, q_col'length) or q_row > to_unsigned(g_HEIGHT - 1, q_col'length)) then
+                    -- If end of line has been reached, increment current line index.
+                    if (q_col = to_unsigned(g_WIDTH + 1, 10)) then
+                        if (q_line_idx = to_unsigned(4, q_line_idx'length)) then
+                            n_line_idx <= (others => '0');
+                        else
+                            n_line_idx <= q_line_idx + to_unsigned(1, q_line_idx'length);
+                        end if;
+                    end if;                    
+                    -- Go to fetch state
+                    n_state <= s_FETCH;
+
                 -- If FIFO not empty or if remaining pixels need to be buffered out
-                if (i_EMPTY = '0' or (q_col > to_unsigned(g_WIDTH - 1, q_col'length) or q_row > to_unsigned(g_HEIGHT - 1, q_col'length))) then
+                elsif (i_EMPTY = '0') then
                     -- Implicit BRAM definition, store pixel in column location
                     if (q_col < to_unsigned(g_WIDTH, q_col'length)) then
-                        n_lines(0)(to_integer(q_col)) <= i_PIXEL;
+                        n_lines(to_integer(q_line_idx))(to_integer(q_col)) <= i_PIXEL;
                         o_RD_EN <= '1';
                     end if;
-
-                    -- If end of line has been reached, shift rows (line counter end is extended by 2 to account for edge pixels)
-                    if (q_col = to_unsigned(g_WIDTH + 1, 10)) then
-                        for i in 0 to 3 loop
-                            n_lines(i + 1) <= q_lines(i);
-                        end loop;
-                    end if;
-
+                    -- Go to fetch state
                     n_state <= s_FETCH;
 
                 end if;
             
             when s_FETCH =>
                     
-                    -- Shift into sliding window
+                    -- For each row of the sliding window
                     for r in 0 to 4 loop
                         -- Shift current pixels
-                        for c in 0 to 3 loop
-                            n_window(r)(c + 1) <= q_window(r)(c);
-                        end loop;
-                        -- Shift in pixels if they exist
+                        n_window(r)(1 to 4) <= q_window(r)(0 to 3);
                         if (q_col > to_unsigned(g_WIDTH - 1, q_col'length)) then
-                            -- Most recent pixels go in position 0
                             n_window(r)(0) <= (others => '0');
                         else
-                            n_window(r)(0) <= q_lines(r)(to_integer(q_col));
+                            if (q_line_idx < to_unsigned(r, q_line_idx'length)) then
+                                n_window(r)(0) <= q_lines(5 + to_integer(q_line_idx) - r)(to_integer(q_col));
+                            else
+                                n_window(r)(0) <= q_lines(to_integer(q_line_idx) - r)(to_integer(q_col));
+                            end if;
                         end if;
                     end loop;
                     
                     -- If enough pixels have been buffered in, start pushing them out
                     if (q_row > to_unsigned(1, q_row'length) and q_col > to_unsigned(1, q_col'length)) then
                         n_state <= s_CALC;
+                    -- If not enough pixels have been buffered in, increment counters and continue reading
                     else
-                        n_state <= s_SKIP;
+                        -- If end of row reached, reset column count and increment row counter
+                        if (q_col = to_unsigned(g_WIDTH + 1, 10)) then
+                            n_row <= q_row + to_unsigned(1, 10);
+                            n_col <= to_unsigned(0, 10);
+                        -- Otherwise, just increment column count
+                        else
+                            n_col <= q_col + to_unsigned(1, 10);
+                        end if;
+
+                        n_state <= s_READ;
                     end if;
 
             when s_CALC =>
@@ -208,19 +235,6 @@ begin
                         n_col <= q_col + to_unsigned(1, 10);
                     end if;
                 end if;
-
-            when s_SKIP =>
-
-                -- If end of row reached, reset column count and increment row counter
-                if (q_col = to_unsigned(g_WIDTH + 1, 10)) then
-                    n_row <= q_row + to_unsigned(1, 10);
-                    n_col <= to_unsigned(0, 10);
-                -- Otherwise, just increment column count
-                else
-                    n_col <= q_col + to_unsigned(1, 10);
-                end if;
-
-                n_state <= s_READ;
 
         end case;
 
