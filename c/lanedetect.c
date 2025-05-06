@@ -42,6 +42,9 @@ static const float cosvals[180] = {1.0, 0.9998476951563913, 0.9993908270190958, 
 #define QUANTIZE_I(i)   (int)((int)(i) * (int)QUANT_VAL)
 #define DEQUANTIZE(i)   (int)((int)(i) / (int)QUANT_VAL)
 
+#define OFFSET_Q    QUANTIZE_F(0.05f)   // = 51
+#define ANGLE_Q     QUANTIZE_F(0.3f)    // = 307
+
 // // Sin and Cos constants generated with the following code:
 // for (int i = 0; i < 180; i++ ) {
 //     printf("0x%x, ", QUANTIZE_F(sinvals[i]) & 0xFFFF);
@@ -267,6 +270,21 @@ void save_result(const char *filepath, char *filename, const unsigned char *head
     strcat(final_filepath, filename);
     write_bmp(final_filepath, header, data);
     free(final_filepath);
+}
+
+void save_indices(const char *filepath, char *filename, int idx) {
+
+    char *final_filepath = malloc(strlen(filepath) + strlen(filename) + 1);
+    strcpy(final_filepath, filepath);
+    strcat(final_filepath, filename);
+
+    FILE *fp = fopen(final_filepath, "w");
+    if (fp == NULL) {
+        printf("Error: Could not open file %s for writing.\n", filename);
+        return;
+    }
+    fprintf(fp, "%x", idx);
+    fclose(fp);
 }
 
 int convert_to_grayscale(struct pixel * data, int height, int width, unsigned char *grayscale_data) {
@@ -617,6 +635,23 @@ void hough_transform(unsigned char *in_data, int height, int width, unsigned int
                     int32_t sum = (int32_t)xs * COS_TABLE[theta] + (int32_t)ys * SIN_TABLE[theta];
                     int rho = DEQUANTIZE(sum)+ (RHOS >> 1);
 
+                    // TESTING CODE
+                    // if (theta >= THETAS - 5 && theta < THETAS) {
+                    //     printf("Pixel: %d, %d\n", y, x);
+                    //     printf("Theta: %d\n", theta);
+                    //     printf("Pixel Data: %x\n", in_data[index]);
+                    //     printf("centered_x: %x\n",  centered_x);
+                    //     printf("centered_y: %x\n",  centered_y);
+                    //     printf("xs: %x\n",  xs);
+                    //     printf("ys: %x\n",  ys);
+                    //     printf("sum_x: %x\n", (int32_t)xs * COS_TABLE[theta]);
+                    //     printf("sum_y: %x\n", (int32_t)ys * SIN_TABLE[theta]);
+                    //     printf("Sum: %x\n",  sum);
+                    //     printf("Rho: %x\n", rho);
+                    //     printf("Buffer: %x\n\n", (theta % 8)* RHOS + rho);
+                    //     getchar();
+                    // }
+
                     if (rho >= 0 && rho < RHOS) {
                         accum_buff[rho * THETAS + theta]++;
                     } else {
@@ -629,7 +664,7 @@ void hough_transform(unsigned char *in_data, int height, int width, unsigned int
 
     for (int i = 0; i < RHOS * THETAS; i++) {
         accumulator[i] = accum_buff[i];
-        // printf("accumulator[%d*THETAS + %d]: %d\n", j, i, accum_buff[j][i]);
+        if (accum_buff[i] > 256) printf("accumulator[%d]: %d\n", i, accum_buff[i]);
     }
 }
 
@@ -675,7 +710,7 @@ void extract_top_lines(unsigned char *in_data, int height, int width, const unsi
     }
 
     for (int i = 0; i < TOP_N; i++) {
-        printf("Vote count: %d, rho index: %d, theta index: %d\n", vote_counts[i], rho_indices[i], theta_indices[i]);
+        // printf("Vote count: %d, rho index: %d, theta index: %d\n", vote_counts[i], rho_indices[i], theta_indices[i]);
 
         float rho = (rho_indices[i] - RHOS / 2) * RHO_RESOLUTION;
         float cos_t = cosvals[theta_indices[i]];
@@ -712,72 +747,127 @@ void extract_top_lines(unsigned char *in_data, int height, int width, const unsi
     }
 }
 
-float calculate_center_lane(const int *rho_indices, const int *theta_indices, const int *vote_counts) {
+float calculate_center_lane(const int *rho_indices, const int *theta_indices, const int *vote_counts, int *left_rho_idx, int *left_theta_idx, int *right_rho_idx, int *right_theta_idx) {
 /**
     * @brief Computes steering correction from top-N Hough peaks.
     *
     * @param rho_indices     Array of rho indices (from extract_top_lines)
     * @param theta_indices   Array of theta indices (from extract_top_lines)
     * @param vote_counts     Array of vote counts (from extract_top_lines)
+    * @param left_rho_idx    Output pointer to store the selected left lane rho index
+    * @param left_theta_idx  Output pointer to store the selected left lane theta index
+    * @param right_rho_idx   Output pointer to store the selected right lane rho index
+    * @param right_theta_idx Output pointer to store the selected right lane theta index
+    *
     * @return                Signed steering correction (float, in pixels or arbitrary units)
 */
 
-    int left_rho_idx = -1, left_theta_idx = -1;
-    int right_rho_idx = -1, right_theta_idx = -1;
+    *left_rho_idx = -1;
+    *left_theta_idx = -1;
+    *right_rho_idx = -1;
+    *right_theta_idx = -1;
+
+    int top_left_votes = -1;
+    int top_right_votes = -1;
+
 
     // Classify left/right lanes
     for (int i = 0; i < TOP_N; i++) {
         int theta = theta_indices[i];
-        if (theta >= 100 && theta <= 160 && left_rho_idx == -1) {
-            left_rho_idx = rho_indices[i];
-            left_theta_idx = theta;
-        } else if (theta >= 20 && theta <= 80 && right_rho_idx == -1) {
-            right_rho_idx = rho_indices[i];
-            right_theta_idx = theta;
-        }
-        if (left_rho_idx != -1 && right_rho_idx != -1) {
-            break;
+        int rho = rho_indices[i];
+        int votes = vote_counts[i];
+        // Only update if the new theta value is closer to 130 (theta - 130 is smaller)
+        if (theta >= 100 && theta <= 160 && top_left_votes <= votes) {
+            if (top_left_votes < votes || 
+                (abs(theta - 130) < abs(*left_theta_idx - 130) && top_left_votes == votes)) {
+                *left_rho_idx = rho_indices[i];
+                *left_theta_idx = theta;
+                top_left_votes = votes;
+            }
+        } else if (theta >= 20 && theta <= 80 && top_right_votes <= votes) {
+            if (top_right_votes < votes || 
+                (abs(theta - 50) < abs(*right_theta_idx - 50) && top_right_votes == votes)) {
+                *right_rho_idx = rho_indices[i];
+                *right_theta_idx = theta;
+                top_right_votes = votes;
+            }
         }
     }
 
-    if (left_rho_idx == -1 || right_rho_idx == -1) {
+    for (int i = 0; i < TOP_N; i++) {
+        // printf("Theta: %x, Rho: %x, Votes: %x\n", theta_indices[i], rho_indices[i], vote_counts[i]);
+    }
+
+    if (*left_rho_idx == -1 || *right_rho_idx == -1) {
         printf("Error: Both lines not found\n");
         // Can't compute correction if both lines not found
         return 0.0f;
+    } else {
+        // printf("Left Found: Theta: %x, Rho: %x\n", *left_theta_idx, *left_rho_idx);
+        // printf("Right Found: Theta: %x, Rho: %x\n", *right_theta_idx, *right_rho_idx);
     }
 
     // Convert indices to actual rho
-    float left_rho  = (left_rho_idx - RHOS / 2) * RHO_RESOLUTION;
-    float right_rho = (right_rho_idx - RHOS / 2) * RHO_RESOLUTION;
+    int left_rho_q  = QUANTIZE_I((*left_rho_idx - (RHOS >> 1)) << RHO_RESOLUTION_LOG);
+    int right_rho_q = QUANTIZE_I((*right_rho_idx - (RHOS >> 1)) << RHO_RESOLUTION_LOG);
 
     // Retrieve cosine values for the left and right lanes
-    float cos_l = cosvals[left_theta_idx];
-    float cos_r = cosvals[right_theta_idx];
+    int cos_l = COS_TABLE[*left_theta_idx];
+    int cos_r = COS_TABLE[*right_theta_idx];
 
     // Don't perform division if overflow could occur
-    if (cos_l == 0.0f || cos_r == 0.0f) {
+    if (cos_l == 0 || cos_r == 0) {
         printf("Error: Could not perform division\n");
-        return 0.0f;
+        return 0;
     }
 
     // Compute x = rho / cos(theta)
     //  This is based on the hough line equation x * cos(θ) + y * sin(θ) = rho,
     //  with y = 0 at the bottom of the image
-    float left_x  = left_rho / cos_l;
-    float right_x = right_rho / cos_r;
+    int abs_left_rho_q = abs(left_rho_q);
+    int abs_right_rho_q = abs(right_rho_q);
+    int abs_cos_l = abs(cos_l);
+    int abs_cos_r = abs(cos_r);
+    int left_x_q, right_x_q;
+    // If onnly one is negative
+    if (abs_left_rho_q != left_rho_q ^ abs_cos_l != cos_l) {
+        left_x_q  = -((abs_left_rho_q  ) / abs_cos_l );// << BITS;
+    } else {
+        left_x_q  = ((abs_left_rho_q  ) / abs_cos_l );// << BITS;
+    }
+    if (abs_right_rho_q != right_rho_q ^ abs_cos_r != cos_r) {
+        right_x_q  = -((abs_right_rho_q  ) / abs_cos_r );// << BITS;
+    } else {
+        right_x_q  = ((abs_right_rho_q  ) / abs_cos_r );// << BITS;
+    }
+
+    left_x_q = left_x_q << BITS;
+    right_x_q = right_x_q << BITS;
 
     // printf("left_x: %d, right_x: %d\n", left_x, right_x);
 
     // Estimate lane center and offset
-    float lane_center = (left_x + right_x) * 0.5f;
-    float offset = (float)IMAGE_CENTER_X - lane_center;
+    int lane_center_q = (left_x_q + right_x_q) / 2;
+    int offset_q = QUANTIZE_I(IMAGE_CENTER_X) - lane_center_q;
 
     // Estimate angle difference
-    float angle_error = (float)(right_theta_idx - left_theta_idx);
+    int angle_error_q = QUANTIZE_I(*right_theta_idx - *left_theta_idx); //QUANTIZE_I
 
     // Steering = offset * K1 + angle * K2
-    float steering = offset * OFFSET + angle_error * ANGLE;
-    return steering;
+    int steering_q = (offset_q * OFFSET_Q + angle_error_q * ANGLE_Q) >> BITS;
+
+    // printf("left_rho_q: %x, right_rho_q: %x\n", left_rho_q, right_rho_q);
+    // printf("cos_l: %x, cos_l: %x\n", cos_l, cos_r);
+    // printf("left_x_q: %x, right_x_q: %x\n", left_x_q, right_x_q);
+    // printf("lane_center_q: %x\n", lane_center_q);
+    // printf("offset_q: %x\n", offset_q);
+    // printf("angle_error_q: %x\n", angle_error_q);
+    // printf("steering_q: %x\n", steering_q >> BITS);
+
+    // printf("Steer: %d (d) %x (h)\n", DEQUANTIZE(steering_q), DEQUANTIZE(steering_q));
+
+    // Final dequantized result
+    return (float) ((steering_q >> BITS) & 0x3FF);
 }
 
 
@@ -811,6 +901,8 @@ int main(int argc, char *argv[]) {
     unsigned char *thresholded = malloc(sizeof(unsigned char) * ROWS * COLS);
     unsigned char *roi = malloc(sizeof(unsigned char) * ROWS * COLS);
     unsigned int *accumulator = malloc(sizeof(unsigned int) * RHOS * THETAS);
+    int left_rho_idx, left_theta_idx;
+    int right_rho_idx, right_theta_idx;
 
     int rho_indices[TOP_N], theta_indices[TOP_N], vote_counts[TOP_N];
     unsigned char header[54];
@@ -833,16 +925,23 @@ int main(int argc, char *argv[]) {
     convert_to_grayscale(rgb_data, height, width, grayscale);
     gaussian_blur(grayscale, height, width, blurred);
     sobel_filter(blurred, height, width, edges);
-    // non_maximum_suppressor(edges, height, width, nms);
-    hysteresis_filter(edges, height, width, thresholded);
+    non_maximum_suppressor(edges, height, width, nms);
+    hysteresis_filter(nms, height, width, thresholded);
     region_of_interest(thresholded, height, width, roi);
     hough_transform(roi, height, width, accumulator);
 
     save_result(output_filepath, "roi_raw.bmp", header, roi);
 
     extract_top_lines(roi, height, width, accumulator, rho_indices, theta_indices, vote_counts);
-    // float steering = calculate_center_lane(rho_indices, theta_indices, vote_counts); // roi, height, width, 255);
+    float steering = calculate_center_lane(rho_indices, theta_indices, vote_counts, &left_rho_idx, &left_theta_idx, &right_rho_idx, &right_theta_idx); // roi, height, width, 255);
     // printf("Steering correction: %.2f\n", steering);
+    // Save the lane calculations
+    save_indices(output_filepath, "left_rho_idx_cmp.txt", left_rho_idx);
+    save_indices(output_filepath, "left_theta_idx_cmp.txt", left_theta_idx);
+    save_indices(output_filepath, "right_rho_idx_cmp.txt", right_rho_idx);
+    save_indices(output_filepath, "right_theta_idx_cmp.txt", right_theta_idx);
+
+    save_indices(output_filepath, "steering_cmp.txt", steering);
 
     // Save the output images
     save_result(output_filepath, "grayscale.bmp", header, grayscale);
