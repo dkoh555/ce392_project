@@ -3,11 +3,6 @@ import uvm_pkg::*;
 
 class my_uvm_transaction extends uvm_sequence_item;
     logic [23:0] image_pixel;
-    logic [BRAM_ADDR_WIDTH-1:0] left_rho;
-    logic [BRAM_ADDR_WIDTH-1:0] left_theta;
-    logic [BRAM_ADDR_WIDTH-1:0] right_rho;
-    logic [BRAM_ADDR_WIDTH-1:0] right_theta;
-    logic [BOT_BITS-1:0] steering;
 
     function new(string name = "");
         super.new(name);
@@ -15,11 +10,6 @@ class my_uvm_transaction extends uvm_sequence_item;
 
     `uvm_object_utils_begin(my_uvm_transaction)
         `uvm_field_int(image_pixel, UVM_ALL_ON)
-        `uvm_field_int(left_rho, UVM_ALL_ON)
-        `uvm_field_int(left_theta, UVM_ALL_ON)
-        `uvm_field_int(right_rho, UVM_ALL_ON)
-        `uvm_field_int(right_theta, UVM_ALL_ON)
-        `uvm_field_int(steering, UVM_ALL_ON)
     `uvm_object_utils_end
 endclass: my_uvm_transaction
 

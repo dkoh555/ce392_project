@@ -8,5 +8,5 @@ interface my_uvm_if;
     logic [23:0] in_din;
     logic        out_empty;
     logic        out_rd_en;
-    logic  [BOT_BITS-1:0] out_steering_dout;
+    logic  [7:0] out_dout;
 endinterface

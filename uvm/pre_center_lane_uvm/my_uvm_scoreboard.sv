@@ -45,11 +45,27 @@ class my_uvm_scoreboard extends uvm_scoreboard;
     endtask: run
 
     virtual function void comparison();
-        if (tx_out.steering != tx_cmp.steering) begin
-            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.steering, tx_out.steering));
+        if (tx_out.left_rho != tx_cmp.left_rho) begin
+            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.left_rho, tx_out.left_rho));
         end else begin
-            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.steering, tx_out.steering), UVM_LOW);
+            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.left_rho, tx_out.left_rho), UVM_LOW);
         end
-        
+        if (tx_out.left_theta != tx_cmp.left_theta) begin
+            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.left_theta, tx_out.left_theta));
+        end else begin
+            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.left_theta, tx_out.left_theta), UVM_LOW);
+        end
+        if (tx_out.right_rho != tx_cmp.right_rho) begin
+            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.right_rho, tx_out.right_rho));
+        end else begin
+            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.right_rho, tx_out.right_rho), UVM_LOW);
+        end
+        if (tx_out.right_theta != tx_cmp.right_theta) begin
+            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.right_theta, tx_out.right_theta));
+        end else begin
+            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.right_theta, tx_out.right_theta), UVM_LOW);
+        end
+
+
     endfunction: comparison
 endclass: my_uvm_scoreboard

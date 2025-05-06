@@ -26,9 +26,7 @@ module my_uvm_tb;
         .g_BOT_BITS(BOT_BITS),
         .g_TOP_BITS(TOP_BITS),
         .g_BUFFS(BUFFS),
-        .g_BUFFS_LOG(BUFFS_LOG),
-        .g_OFFSET(OFFSET),
-        .g_ANGLE(ANGLE)
+        .g_BUFFS_LOG(BUFFS_LOG)
     ) lanedetect_top_inst (
         .i_CLK(vif.clock),
         .i_RST(vif.reset), 
@@ -38,11 +36,10 @@ module my_uvm_tb;
         // .o_PIXEL(vif.out_dout),
         .o_EMPTY(vif.out_empty),
         .i_RD_EN(vif.out_rd_en),
-        // .o_LEFT_RHO(vif.out_left_rho_dout),
-        // .o_LEFT_THETA(vif.out_left_theta_dout),
-        // .o_RIGHT_RHO(vif.out_right_rho_dout),
-        // .o_RIGHT_THETA(vif.out_right_theta_dout)
-        .o_STEERING(vif.out_steering_dout)
+        .o_LEFT_RHO(vif.out_left_rho_dout),
+        .o_LEFT_THETA(vif.out_left_theta_dout),
+        .o_RIGHT_RHO(vif.out_right_rho_dout),
+        .o_RIGHT_THETA(vif.out_right_theta_dout)
     );
 
     initial begin

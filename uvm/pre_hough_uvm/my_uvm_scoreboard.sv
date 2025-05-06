@@ -45,11 +45,14 @@ class my_uvm_scoreboard extends uvm_scoreboard;
     endtask: run
 
     virtual function void comparison();
-        if (tx_out.steering != tx_cmp.steering) begin
-            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.steering, tx_out.steering));
+        if (tx_out.image_pixel != tx_cmp.image_pixel) begin
+            // use uvm_error to report errors and continue
+            // use uvm_fatal to halt the simulation on error
+            `uvm_info("SB_CMP", tx_out.sprint(), UVM_LOW);
+            `uvm_info("SB_CMP", tx_cmp.sprint(), UVM_LOW);
+            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.image_pixel, tx_out.image_pixel));
         end else begin
-            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.steering, tx_out.steering), UVM_LOW);
+            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.image_pixel, tx_out.image_pixel), UVM_LOW);
         end
-        
     endfunction: comparison
 endclass: my_uvm_scoreboard
