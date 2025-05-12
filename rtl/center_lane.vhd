@@ -161,6 +161,17 @@ begin
                     o_RD_EN <= '1';
                 end if;
 
+                n_rho_q     <= (others => (others => '0'));
+                n_cos_q     <= (others => (others => '0'));
+                n_rho_q_abs <= (others => (others => '0'));
+                n_cos_q_abs <= (others => (others => '0'));
+                n_shift     <= (others => (others => '0'));
+                n_quotient  <= (others => (others => '0'));
+                n_x         <= (others => (others => '0'));
+                n_offset_q  <= (others => '0');
+                n_angle_q   <= (others => '0');
+                n_steering  <= (others => '0');
+
             when s_PREDIVIDE0 =>
                 -- Compute actual rho from rho indices, then shift by BOT_BITS to prepare numerator
                 for i in 0 to 1 loop

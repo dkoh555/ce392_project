@@ -19,8 +19,8 @@ entity lanedetect_top is
         g_RHOS          : integer := 450;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
         g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64)
         g_TOP_N         : integer := 16;    -- Number of top voted Rhos and Theta values to consider
-        g_BRAM_ADDR_WIDTH : integer := 17;  -- Clog2(g_RHOS * g_THETAS), size of BRAM to hold votes
-        g_BRAM_DATA_WIDTH : integer := 19;  -- Clog2(g_HEIGHT * g_WIDTH), maximum count of votes for each Rho
+        g_BRAM_ADDR_WIDTH : integer := 10;  -- Clog2(g_RHOS * g_THETAS), size of BRAM to hold votes
+        g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(g_HEIGHT * g_WIDTH), maximum count of votes for each Rho
         -- Quantization
         g_BOT_BITS : integer := 10;
         g_TOP_BITS : integer := 10;
@@ -42,18 +42,16 @@ entity lanedetect_top is
         i_WR_EN     : in    std_logic;
 
         -- Output pixel data
-        -- o_PIXEL     : out   std_logic_vector(7 downto 0);
-        -- o_EMPTY     : out   std_logic;
-        -- i_RD_EN     : in    std_logic;
+        o_EMPTY     : out   std_logic;
+        i_RD_EN     : in    std_logic;
+        -- o_PIXEL     : out   std_logic_vector(7 downto 0)
 
         -- Output steering data
-        o_EMPTY         : out std_logic;
-        i_RD_EN         : in  std_logic;
         -- o_LEFT_RHO      : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0);
         -- o_LEFT_THETA    : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0);
         -- o_RIGHT_RHO     : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0);
         -- o_RIGHT_THETA   : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0)
-
+        
         o_STEERING      : out std_logic_vector(g_BOT_BITS - 1 downto 0)
     );
 
@@ -381,240 +379,240 @@ architecture rtl of lanedetect_top is
 
 begin
 
-    input_fifo_inst : fifo
-        generic map (
-            FIFO_DATA_WIDTH     => 24,
-            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
-        )
-        port map (
-            reset   => i_RST,
-            wr_clk  => i_CLK,
-            wr_en   => i_WR_EN,
-            din     => i_PIXEL,
-            full    => o_FULL,
-            rd_clk  => i_CLK,
-            rd_en   => w_input_rd_en,
-            dout    => w_input_data,
-            empty   => w_input_empty
-        );
+    -- input_fifo_inst : fifo
+    --     generic map (
+    --         FIFO_DATA_WIDTH     => 24,
+    --         FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
+    --     )
+    --     port map (
+    --         reset   => i_RST,
+    --         wr_clk  => i_CLK,
+    --         wr_en   => i_WR_EN,
+    --         din     => i_PIXEL,
+    --         full    => o_FULL,
+    --         rd_clk  => i_CLK,
+    --         rd_en   => w_input_rd_en,
+    --         dout    => w_input_data,
+    --         empty   => w_input_empty
+    --     );
 
-    grayscale_inst : grayscale
-        generic map (
-            g_HEIGHT => g_HEIGHT,
-            g_WIDTH  => g_WIDTH
-        )
-        port map (
-            i_CLK   => i_CLK,
-            i_RST   => i_RST,
-            -- Input FIFO signals
-            i_PIXEL => w_input_data,
-            i_EMPTY => w_input_empty,
-            o_RD_EN => w_input_rd_en,
-            -- Output FIFO signals
-            o_PIXEL => w_grayscale_din,
-            i_FULL  => w_grayscale_full,
-            o_WR_EN => w_grayscale_wr_en
-        );
+    -- grayscale_inst : grayscale
+    --     generic map (
+    --         g_HEIGHT => g_HEIGHT,
+    --         g_WIDTH  => g_WIDTH
+    --     )
+    --     port map (
+    --         i_CLK   => i_CLK,
+    --         i_RST   => i_RST,
+    --         -- Input FIFO signals
+    --         i_PIXEL => w_input_data,
+    --         i_EMPTY => w_input_empty,
+    --         o_RD_EN => w_input_rd_en,
+    --         -- Output FIFO signals
+    --         o_PIXEL => w_grayscale_din,
+    --         i_FULL  => w_grayscale_full,
+    --         o_WR_EN => w_grayscale_wr_en
+    --     );
 
-    grayscale_fifo_inst : fifo
-        generic map (
-            FIFO_DATA_WIDTH     => 8,
-            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
-        )
-        port map (
-            reset   => i_RST,
-            wr_clk  => i_CLK,
-            wr_en   => w_grayscale_wr_en,
-            din     => w_grayscale_din,
-            full    => w_grayscale_full,
-            rd_clk  => i_CLK,
-            rd_en   => w_grayscale_rd_en,
-            dout    => w_grayscale_dout,
-            empty   => w_grayscale_empty
-        );
+    -- grayscale_fifo_inst : fifo
+    --     generic map (
+    --         FIFO_DATA_WIDTH     => 8,
+    --         FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
+    --     )
+    --     port map (
+    --         reset   => i_RST,
+    --         wr_clk  => i_CLK,
+    --         wr_en   => w_grayscale_wr_en,
+    --         din     => w_grayscale_din,
+    --         full    => w_grayscale_full,
+    --         rd_clk  => i_CLK,
+    --         rd_en   => w_grayscale_rd_en,
+    --         dout    => w_grayscale_dout,
+    --         empty   => w_grayscale_empty
+    --     );
 
-    -- o_PIXEL <= w_grayscale_dout;
-    -- o_EMPTY <= w_grayscale_empty;
-    -- w_grayscale_rd_en <= i_RD_EN;
+    -- -- o_PIXEL <= w_grayscale_dout;
+    -- -- o_EMPTY <= w_grayscale_empty;
+    -- -- w_grayscale_rd_en <= i_RD_EN;
 
-    gaussian_blur_inst : gaussian_blur
-        generic map (
-            g_HEIGHT => g_HEIGHT,
-            g_WIDTH  => g_WIDTH
-        )
-        port map (
-            i_CLK => i_CLK,
-            i_RST => i_RST,
-            -- Input FIFO signals
-            i_PIXEL => w_grayscale_dout,
-            i_EMPTY => w_grayscale_empty,
-            o_RD_EN => w_grayscale_rd_en,
-            -- Output FIFO signals
-            o_PIXEL => w_gaussian_blur_din,
-            i_FULL  => w_gaussian_blur_full,
-            o_WR_EN => w_gaussian_blur_wr_en
-        );
+    -- gaussian_blur_inst : gaussian_blur
+    --     generic map (
+    --         g_HEIGHT => g_HEIGHT,
+    --         g_WIDTH  => g_WIDTH
+    --     )
+    --     port map (
+    --         i_CLK => i_CLK,
+    --         i_RST => i_RST,
+    --         -- Input FIFO signals
+    --         i_PIXEL => w_grayscale_dout,
+    --         i_EMPTY => w_grayscale_empty,
+    --         o_RD_EN => w_grayscale_rd_en,
+    --         -- Output FIFO signals
+    --         o_PIXEL => w_gaussian_blur_din,
+    --         i_FULL  => w_gaussian_blur_full,
+    --         o_WR_EN => w_gaussian_blur_wr_en
+    --     );
 
-    gaussian_blur_fifo_inst : fifo
-        generic map (
-            FIFO_DATA_WIDTH     => 8,
-            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
-        )
-        port map (
-            reset   => i_RST,
-            wr_clk  => i_CLK,
-            wr_en   => w_gaussian_blur_wr_en,
-            din     => w_gaussian_blur_din,
-            full    => w_gaussian_blur_full,
-            rd_clk  => i_CLK,
-            rd_en   => w_gaussian_blur_rd_en,
-            dout    => w_gaussian_blur_dout,
-            empty   => w_gaussian_blur_empty
-        );
+    -- gaussian_blur_fifo_inst : fifo
+    --     generic map (
+    --         FIFO_DATA_WIDTH     => 8,
+    --         FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
+    --     )
+    --     port map (
+    --         reset   => i_RST,
+    --         wr_clk  => i_CLK,
+    --         wr_en   => w_gaussian_blur_wr_en,
+    --         din     => w_gaussian_blur_din,
+    --         full    => w_gaussian_blur_full,
+    --         rd_clk  => i_CLK,
+    --         rd_en   => w_gaussian_blur_rd_en,
+    --         dout    => w_gaussian_blur_dout,
+    --         empty   => w_gaussian_blur_empty
+    --     );
 
-    -- o_PIXEL <= w_gaussian_blur_dout;
-    -- o_EMPTY <= w_gaussian_blur_empty;
-    -- w_gaussian_blur_rd_en <= i_RD_EN;
-
-
-    sobel_inst : sobel
-        generic map (
-            g_HEIGHT => g_HEIGHT,
-            g_WIDTH  => g_WIDTH
-        )
-        port map (
-            i_CLK => i_CLK,
-            i_RST => i_RST,
-            -- Input FIFO signals
-            i_PIXEL => w_gaussian_blur_dout,
-            i_EMPTY => w_gaussian_blur_empty,
-            o_RD_EN => w_gaussian_blur_rd_en,
-            -- Output FIFO signals
-            o_PIXEL => w_sobel_din,
-            i_FULL  => w_sobel_full,
-            o_WR_EN => w_sobel_wr_en
-        );
-
-    sobel_fifo_inst : fifo
-        generic map (
-            FIFO_DATA_WIDTH     => 8,
-            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
-        )
-        port map (
-            reset   => i_RST,
-            wr_clk  => i_CLK,
-            wr_en   => w_sobel_wr_en,
-            din     => w_sobel_din,
-            full    => w_sobel_full,
-            rd_clk  => i_CLK,
-            rd_en   => w_sobel_rd_en,
-            dout    => w_sobel_dout,
-            empty   => w_sobel_empty
-        );
-
-    -- o_PIXEL <= w_sobel_dout;
-    -- o_EMPTY <= w_sobel_empty;
-    -- w_sobel_rd_en <= i_RD_EN;
-
-    non_max_suppression_inst : non_max_suppression
-        generic map (
-            g_HEIGHT => g_HEIGHT,
-            g_WIDTH  => g_WIDTH
-        )
-        port map (
-            i_CLK => i_CLK,
-            i_RST => i_RST,
-            -- Input FIFO signals
-            i_PIXEL => w_sobel_dout,
-            i_EMPTY => w_sobel_empty,
-            o_RD_EN => w_sobel_rd_en,
-            -- Output FIFO signals
-            o_PIXEL => w_non_max_suppression_din,
-            i_FULL  => w_non_max_suppression_full,
-            o_WR_EN => w_non_max_suppression_wr_en
-        );
-
-    non_max_suppression_fifo_inst : fifo
-        generic map (
-            FIFO_DATA_WIDTH     => 8,
-            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
-        )
-        port map (
-            reset   => i_RST,
-            wr_clk  => i_CLK,
-            wr_en   => w_non_max_suppression_wr_en,
-            din     => w_non_max_suppression_din,
-            full    => w_non_max_suppression_full,
-            rd_clk  => i_CLK,
-            rd_en   => w_non_max_suppression_rd_en,
-            dout    => w_non_max_suppression_dout,
-            empty   => w_non_max_suppression_empty
-        );
+    -- -- o_PIXEL <= w_gaussian_blur_dout;
+    -- -- o_EMPTY <= w_gaussian_blur_empty;
+    -- -- w_gaussian_blur_rd_en <= i_RD_EN;
 
 
-    -- o_PIXEL <= w_non_max_suppression_dout;
-    -- o_EMPTY <= w_non_max_suppression_empty;
-    -- w_non_max_suppression_rd_en <= i_RD_EN;
+    -- sobel_inst : sobel
+    --     generic map (
+    --         g_HEIGHT => g_HEIGHT,
+    --         g_WIDTH  => g_WIDTH
+    --     )
+    --     port map (
+    --         i_CLK => i_CLK,
+    --         i_RST => i_RST,
+    --         -- Input FIFO signals
+    --         i_PIXEL => w_gaussian_blur_dout,
+    --         i_EMPTY => w_gaussian_blur_empty,
+    --         o_RD_EN => w_gaussian_blur_rd_en,
+    --         -- Output FIFO signals
+    --         o_PIXEL => w_sobel_din,
+    --         i_FULL  => w_sobel_full,
+    --         o_WR_EN => w_sobel_wr_en
+    --     );
 
-    hysteresis_inst : hysteresis
-        generic map (
-            g_HEIGHT => g_HEIGHT,
-            g_WIDTH  => g_WIDTH,
-            g_HIGH_THRESHOLD => g_HYSTERESIS_HIGH_THRESHOLD,
-            g_LOW_THRESHOLD => g_HYSTERESIS_LOW_THRESHOLD
-        )
-        port map (
-            i_CLK => i_CLK,
-            i_RST => i_RST,
-            -- Input FIFO signals
-            i_PIXEL => w_non_max_suppression_dout,
-            i_EMPTY => w_non_max_suppression_empty,
-            o_RD_EN => w_non_max_suppression_rd_en,
-            -- Output FIFO signals
-            o_PIXEL => w_hysteresis_din,
-            i_FULL  => w_hysteresis_full,
-            o_WR_EN => w_hysteresis_wr_en
-        );
+    -- sobel_fifo_inst : fifo
+    --     generic map (
+    --         FIFO_DATA_WIDTH     => 8,
+    --         FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
+    --     )
+    --     port map (
+    --         reset   => i_RST,
+    --         wr_clk  => i_CLK,
+    --         wr_en   => w_sobel_wr_en,
+    --         din     => w_sobel_din,
+    --         full    => w_sobel_full,
+    --         rd_clk  => i_CLK,
+    --         rd_en   => w_sobel_rd_en,
+    --         dout    => w_sobel_dout,
+    --         empty   => w_sobel_empty
+    --     );
 
-    hysteresis_fifo_inst : fifo
-        generic map (
-            FIFO_DATA_WIDTH     => 8,
-            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
-        )
-        port map (
-            reset   => i_RST,
-            wr_clk  => i_CLK,
-            wr_en   => w_hysteresis_wr_en,
-            din     => w_hysteresis_din,
-            full    => w_hysteresis_full,
-            rd_clk  => i_CLK,
-            rd_en   => w_hysteresis_rd_en,
-            dout    => w_hysteresis_dout,
-            empty   => w_hysteresis_empty
-        );
+    -- -- o_PIXEL <= w_sobel_dout;
+    -- -- o_EMPTY <= w_sobel_empty;
+    -- -- w_sobel_rd_en <= i_RD_EN;
+
+    -- non_max_suppression_inst : non_max_suppression
+    --     generic map (
+    --         g_HEIGHT => g_HEIGHT,
+    --         g_WIDTH  => g_WIDTH
+    --     )
+    --     port map (
+    --         i_CLK => i_CLK,
+    --         i_RST => i_RST,
+    --         -- Input FIFO signals
+    --         i_PIXEL => w_sobel_dout,
+    --         i_EMPTY => w_sobel_empty,
+    --         o_RD_EN => w_sobel_rd_en,
+    --         -- Output FIFO signals
+    --         o_PIXEL => w_non_max_suppression_din,
+    --         i_FULL  => w_non_max_suppression_full,
+    --         o_WR_EN => w_non_max_suppression_wr_en
+    --     );
+
+    -- non_max_suppression_fifo_inst : fifo
+    --     generic map (
+    --         FIFO_DATA_WIDTH     => 8,
+    --         FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
+    --     )
+    --     port map (
+    --         reset   => i_RST,
+    --         wr_clk  => i_CLK,
+    --         wr_en   => w_non_max_suppression_wr_en,
+    --         din     => w_non_max_suppression_din,
+    --         full    => w_non_max_suppression_full,
+    --         rd_clk  => i_CLK,
+    --         rd_en   => w_non_max_suppression_rd_en,
+    --         dout    => w_non_max_suppression_dout,
+    --         empty   => w_non_max_suppression_empty
+    --     );
+
+
+    -- -- o_PIXEL <= w_non_max_suppression_dout;
+    -- -- o_EMPTY <= w_non_max_suppression_empty;
+    -- -- w_non_max_suppression_rd_en <= i_RD_EN;
+
+    -- hysteresis_inst : hysteresis
+    --     generic map (
+    --         g_HEIGHT => g_HEIGHT,
+    --         g_WIDTH  => g_WIDTH,
+    --         g_HIGH_THRESHOLD => g_HYSTERESIS_HIGH_THRESHOLD,
+    --         g_LOW_THRESHOLD => g_HYSTERESIS_LOW_THRESHOLD
+    --     )
+    --     port map (
+    --         i_CLK => i_CLK,
+    --         i_RST => i_RST,
+    --         -- Input FIFO signals
+    --         i_PIXEL => w_non_max_suppression_dout,
+    --         i_EMPTY => w_non_max_suppression_empty,
+    --         o_RD_EN => w_non_max_suppression_rd_en,
+    --         -- Output FIFO signals
+    --         o_PIXEL => w_hysteresis_din,
+    --         i_FULL  => w_hysteresis_full,
+    --         o_WR_EN => w_hysteresis_wr_en
+    --     );
+
+    -- hysteresis_fifo_inst : fifo
+    --     generic map (
+    --         FIFO_DATA_WIDTH     => 8,
+    --         FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
+    --     )
+    --     port map (
+    --         reset   => i_RST,
+    --         wr_clk  => i_CLK,
+    --         wr_en   => w_hysteresis_wr_en,
+    --         din     => w_hysteresis_din,
+    --         full    => w_hysteresis_full,
+    --         rd_clk  => i_CLK,
+    --         rd_en   => w_hysteresis_rd_en,
+    --         dout    => w_hysteresis_dout,
+    --         empty   => w_hysteresis_empty
+    --     );
 
     -- o_PIXEL <= w_hysteresis_dout;
     -- o_EMPTY <= w_hysteresis_empty;
     -- w_hysteresis_rd_en <= i_RD_EN;
 
-    roi_inst : roi
-        generic map (
-            g_HEIGHT => g_HEIGHT,
-            g_WIDTH  => g_WIDTH,
-            g_ROI    => g_ROI
-        )
-        port map (
-            i_CLK => i_CLK,
-            i_RST => i_RST,
-            -- Input FIFO signals
-            i_PIXEL => w_hysteresis_dout,
-            i_EMPTY => w_hysteresis_empty,
-            o_RD_EN => w_hysteresis_rd_en,
-            -- Output FIFO signals
-            o_PIXEL => w_roi_din,
-            i_FULL  => w_roi_full,
-            o_WR_EN => w_roi_wr_en
-        );
+    -- roi_inst : roi
+    --     generic map (
+    --         g_HEIGHT => g_HEIGHT,
+    --         g_WIDTH  => g_WIDTH,
+    --         g_ROI    => g_ROI
+    --     )
+    --     port map (
+    --         i_CLK => i_CLK,
+    --         i_RST => i_RST,
+    --         -- Input FIFO signals
+    --         i_PIXEL => w_hysteresis_dout,
+    --         i_EMPTY => w_hysteresis_empty,
+    --         o_RD_EN => w_hysteresis_rd_en,
+    --         -- Output FIFO signals
+    --         o_PIXEL => w_roi_din,
+    --         i_FULL  => w_roi_full,
+    --         o_WR_EN => w_roi_wr_en
+    --     );
 
     roi_fifo_inst : fifo
         generic map (
@@ -622,17 +620,16 @@ begin
             FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
         )
         port map (
-            -- reset   => i_RST,
-            -- wr_clk  => i_CLK,
-            -- wr_en   => i_WR_EN,
-            -- din     => i_PIXEL(7 downto 0),
-            -- full    => o_FULL,
-            -- rd_clk  => i_CLK,
             reset   => i_RST,
             wr_clk  => i_CLK,
-            wr_en   => w_roi_wr_en,
-            din     => w_roi_din,
-            full    => w_roi_full,
+            wr_en   => i_WR_EN,
+            din     => i_PIXEL(7 downto 0),
+            full    => o_FULL,
+            -- reset   => i_RST,
+            -- wr_clk  => i_CLK,
+            -- wr_en   => w_roi_wr_en,
+            -- din     => w_roi_din,
+            -- full    => w_roi_full,
             rd_clk  => i_CLK,
             rd_en   => w_roi_rd_en,
             dout    => w_roi_dout,

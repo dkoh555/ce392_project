@@ -29,10 +29,14 @@ end entity sobel;
 
 architecture rtl of sobel is
 
-    -- 3 Line pixel buffer
-    type t_pixel_line is array (0 to g_WIDTH - 1) of std_logic_vector(7 downto 0);
-    type t_pixel_lines is array (0 to 2) of t_pixel_line;    
-    signal q_lines, n_lines : t_pixel_lines;
+    -- BRAM to replace registers
+    constant c_BRAMS : integer := 3;
+    constant c_BRAM_ADDR_WIDTH : integer := CLOG2(g_WIDTH);
+    type t_bram_data is array (0 to c_BRAMS - 1) of std_logic_vector(7 downto 0);
+    type t_bram_en   is array (0 to c_BRAMS - 1) of std_logic;
+    signal w_addr : std_logic_vector(c_BRAM_ADDR_WIDTH - 1 downto 0);
+    signal q_wr_en, n_wr_en : t_bram_en;
+    signal w_rd_data : t_bram_data;
 
     -- Current line
     signal q_line_idx, n_line_idx : unsigned(2 downto 0);
@@ -41,9 +45,10 @@ architecture rtl of sobel is
     type t_pixel_window_line is array (0 to 2) of std_logic_vector(7 downto 0);
     type t_pixel_window is array (0 to 2) of t_pixel_window_line;
     signal q_window, n_window : t_pixel_window;
+    signal q_i_pixel, n_i_pixel : std_logic_vector(7 downto 0);
 
     -- State signals
-    type t_state is (s_READ, s_FETCH, s_CALC, s_WRITE, s_SKIP);
+    type t_state is (s_READ, s_WAIT, s_FETCH, s_CALC, s_WRITE);
     signal q_state, n_state : t_state;
 
     -- Hard coded width for row and column count
@@ -58,18 +63,48 @@ architecture rtl of sobel is
     signal q_pixel, n_pixel : std_logic_vector(7 downto 0);
     signal w_h_grad, w_v_grad : signed(15 downto 0);
     
-
-    signal w_test : signed(15 downto 0);
+    component bram is
+        generic (
+            BRAM_ADDR_WIDTH : integer := 10;
+            BRAM_DATA_WIDTH : integer := 8
+        );
+        port (
+            clock   : in std_logic;
+            rd_addr : in std_logic_vector(BRAM_ADDR_WIDTH - 1 downto 0);
+            wr_addr : in std_logic_vector(BRAM_ADDR_WIDTH - 1 downto 0);
+            wr_en   : in std_logic;
+            din     : in std_logic_vector(BRAM_DATA_WIDTH - 1 downto 0);
+            dout    : out std_logic_vector(BRAM_DATA_WIDTH - 1 downto 0) 
+        );
+    end component bram;
 
 begin
+
+    gen_buff : for i in 0 to c_BRAMS - 1 generate
+        buff : bram
+            generic map (
+                BRAM_ADDR_WIDTH => c_BRAM_ADDR_WIDTH,
+                BRAM_DATA_WIDTH => 8
+            )
+            port map (
+                clock   => i_CLK,
+                -- Since reading/writing only occurs for one address, only one signal is required.
+                rd_addr => w_addr,
+                wr_addr => w_addr,
+                wr_en   => q_wr_en(i),
+                din     => q_i_pixel,
+                dout    => w_rd_data(i)
+            );
+    end generate;
 
     state_seq : process (i_CLK, i_RST) begin
 
         if (i_RST = '1') then
             -- Pixel buffer and sliding window
-            q_lines <= (others => (others => (others => '0')));
+            q_wr_en <= (others => '0');
             q_window <= (others => (others => (others => '0')));
             q_line_idx <= (others => '0');
+            q_i_pixel <= (others => '0');
             -- States
             q_state <= s_READ;
             -- Pixel arithmetic
@@ -81,9 +116,10 @@ begin
             q_pixel   <= (others => '0');
         elsif (rising_edge(i_CLK)) then
             -- Pixel buffer and sliding window
-            q_lines <= n_lines;
+            q_wr_en <= n_wr_en;
             q_window <= n_window;
             q_line_idx <= n_line_idx;
+            q_i_pixel <= n_i_pixel;
             -- States
             q_state <= n_state;
             -- Pixel arithmetic
@@ -97,12 +133,14 @@ begin
 
     end process state_seq;
 
-    state_comb : process (q_lines, q_state, q_col, q_row, q_window, q_calc_count, q_h_sum, q_v_sum, i_PIXEL, i_EMPTY, n_lines, w_v_grad, w_h_grad, q_pixel, i_FULL, q_line_idx) begin
+    state_comb : process (q_state, w_addr, q_wr_en, q_i_pixel, w_rd_data, q_col, q_row, q_window, q_calc_count, q_h_sum, q_v_sum, i_PIXEL, i_EMPTY, w_v_grad, w_h_grad, q_pixel, i_FULL, q_line_idx) begin
 
         -- Default signal assignment
-        n_lines <= q_lines;
+        w_addr <= std_logic_vector(resize(q_col, c_BRAM_ADDR_WIDTH));
+        n_wr_en <= (others => '0');
         n_window <= q_window;
         n_line_idx <= q_line_idx;
+        n_i_pixel <= q_i_pixel;
         n_state <= q_state;
         n_col   <= q_col;
         n_row   <= q_row;
@@ -112,13 +150,10 @@ begin
         o_RD_EN <= '0';
         o_WR_EN <= '0';
         n_pixel <= q_pixel;        
-        
-        -- w_test <= to_signed(SOBEL_H_KERNEL(2, 2), 8) * signed(q_window(2)(2));
-        w_test <= (w_v_grad + w_h_grad);
-        
+        w_h_grad <= q_h_sum(0);
+        w_v_grad <= q_v_sum(0);
         o_PIXEL <= std_logic_vector(q_pixel);
         
-
         case (q_state) is
 
             when s_READ =>
@@ -133,38 +168,41 @@ begin
                             n_line_idx <= q_line_idx + to_unsigned(1, q_line_idx'length);
                         end if;
                     end if;                    
-                    -- Go to fetch state
+                    -- Go to fetch state since no writing is necessary
                     n_state <= s_FETCH;
 
                 -- If FIFO not empty or if remaining pixels need to be buffered out
                 elsif (i_EMPTY = '0') then
-                    -- Implicit BRAM definition, store pixel in column location
-                    if (q_col < to_unsigned(g_WIDTH, q_col'length)) then
-                        n_lines(to_integer(q_line_idx))(to_integer(q_col)) <= i_PIXEL;
+                    -- Store pixel in specific BRAM and location
+                    if (q_col < to_unsigned(g_WIDTH, q_col'length)) then -- OPTIMIZATION: Remove this if statement
+                        -- Assert write enable only for current BRAM
+                        n_i_pixel <= i_PIXEL;
+                        n_wr_en(to_integer(q_line_idx)) <= '1';
                         o_RD_EN <= '1';
                     end if;
-                    -- Go to fetch state
-                    n_state <= s_FETCH;
-
+                    -- Go to wait state
+                    n_state <= s_WAIT;
                 end if;
+
+            when s_WAIT =>
+                -- Once data has been stored in BRAM, go to next state
+                n_state <= s_FETCH;
 
             when s_FETCH =>
                 
                 -- Shift into sliding window
                 for r in 0 to 2 loop
                     -- Shift current pixels
-                    for c in 0 to 1 loop
-                        n_window(r)(c + 1) <= q_window(r)(c);
-                    end loop;
+                    n_window(r)(1 to 2) <= q_window(r)(0 to 1);
                     -- Shift in pixels if they exist
                     if (q_col > to_unsigned(g_WIDTH - 1, q_col'length)) then
                         -- Most recent pixels go in position 0
                         n_window(r)(0) <= (others => '0');
                     else
                         if (q_line_idx < to_unsigned(r, q_line_idx'length)) then
-                            n_window(r)(0) <= q_lines(3 + to_integer(q_line_idx) - r)(to_integer(q_col));
+                            n_window(r)(0) <= w_rd_data(3 + to_integer(q_line_idx) - r);
                         else
-                            n_window(r)(0) <= q_lines(to_integer(q_line_idx) - r)(to_integer(q_col));
+                            n_window(r)(0) <= w_rd_data(to_integer(q_line_idx) - r);
                         end if;
                     end if;
                 end loop;
@@ -172,8 +210,18 @@ begin
                 -- If enough pixels have been buffered in, start pushing them out
                 if (q_row > to_unsigned(0, q_row'length) and q_col > to_unsigned(0, q_col'length)) then
                     n_state <= s_CALC;
+                -- If not enough pixels have been buffered in, increment counters and continue reading
                 else
-                    n_state <= s_SKIP;
+                    -- If end of row reached, reset column count and increment row counter
+                    if (q_col = to_unsigned(g_WIDTH, 10)) then
+                        n_row <= q_row + to_unsigned(1, 10);
+                        n_col <= to_unsigned(0, 10);
+                    -- Otherwise, just increment column count
+                    else
+                        n_col <= q_col + to_unsigned(1, 10);
+                    end if;
+
+                    n_state <= s_READ;
                 end if;
 
             when s_CALC =>
@@ -254,19 +302,6 @@ begin
                         n_col <= q_col + to_unsigned(1, 10);
                     end if;
                 end if;
-
-            when s_SKIP =>
-
-                -- If end of row reached, reset column count and increment row counter
-                if (q_col = to_unsigned(g_WIDTH, 10)) then
-                    n_row <= q_row + to_unsigned(1, 10);
-                    n_col <= to_unsigned(0, 10);
-                -- Otherwise, just increment column count
-                else
-                    n_col <= q_col + to_unsigned(1, 10);
-                end if;
-
-                n_state <= s_READ;
 
         end case;
 

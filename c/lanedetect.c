@@ -947,7 +947,7 @@ int main(int argc, char *argv[]) {
     save_result(output_filepath, "grayscale.bmp", header, grayscale);
     save_result(output_filepath, "blurred.bmp", header, blurred);
     save_result(output_filepath, "edges.bmp", header, edges);
-    // save_result(output_filepath, "nms.bmp", header, nms);
+    save_result(output_filepath, "nms.bmp", header, nms);
     save_result(output_filepath, "thresholded.bmp", header, thresholded);
     save_result(output_filepath, "roi.bmp", header, roi);
     // save_result(output_filepath, "accumulator.bmp", header, accumulator);

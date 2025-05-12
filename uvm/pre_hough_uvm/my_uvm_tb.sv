@@ -13,7 +13,22 @@ module my_uvm_tb;
     lanedetect_top #(
         .g_FIFO_BUFFER_SIZE(64),
         .g_WIDTH(IMG_WIDTH),
-        .g_HEIGHT(IMG_HEIGHT)
+        .g_HEIGHT(IMG_HEIGHT),
+        .g_HYSTERESIS_HIGH_THRESHOLD(HYSTERESIS_HIGH_THRESHOLD),
+        .g_HYSTERESIS_LOW_THRESHOLD(HYSTERESIS_LOW_THRESHOLD),
+        .g_ROI(ROI),
+        .g_RHO_RES_LOG(RHO_RES_LOG),
+        .g_RHOS(RHOS),
+        .g_THETAs(THETAS),
+        .g_TOP_N(TOP_N),
+        .g_BRAM_ADDR_WIDTH(BRAM_ADDR_WIDTH),
+        .g_BRAM_DATA_WIDTH(BRAM_DATA_WIDTH),
+        .g_BOT_BITS(BOT_BITS),
+        .g_TOP_BITS(TOP_BITS),
+        .g_BUFFS(BUFFS),
+        .g_BUFFS_LOG(BUFFS_LOG),
+        .g_OFFSET(OFFSET),
+        .g_ANGLE(ANGLE)
     ) lanedetect_top_inst (
         .i_CLK(vif.clock),
         .i_RST(vif.reset), 

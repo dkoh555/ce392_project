@@ -14,8 +14,8 @@ entity hough is
         g_RHOS          : integer := 450;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
         g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64), also represents number of brams to be used
         g_TOP_N         : integer := 16;    -- Number of top voted Rhos and Theta values to consider
-        g_BRAM_ADDR_WIDTH : integer := 17;  -- Clog2(g_RHOS * c_THETA_PER_BRAM), size of BRAM to hold votes
-        g_BRAM_DATA_WIDTH : integer := 19;  -- Clog2(g_HEIGHT * g_WIDTH), maximum count of votes for each Rho
+        g_BRAM_ADDR_WIDTH : integer := 10;  -- Maximum size based on g_BRAM_DATA_WIDTH and maximum BRAM size
+        g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(sqrt(g_HEIGHT^2 + g_WIDTH^2)), maximum count of votes for each Rho is the diagonal of the image
         -- Quantization
         g_BOT_BITS : integer := 10;
         g_TOP_BITS : integer := 10;
@@ -47,7 +47,10 @@ end entity hough;
 
 architecture rtl of hough is 
 
-    constant c_THETA_PER_BRAM : integer := 8;
+    -- Note: According to Quartus, the total size of a BRAM must be less than 2*20 bits
+    --  Thus, the total number of theta values per BRAM is limited by g_BRAM_ADDR_WIDTH.
+    --  Each theta value is associated with g_RHOS rho values.
+    constant c_THETA_PER_BRAM : integer := (2 ** g_BRAM_ADDR_WIDTH) / g_RHOS;
     constant c_BRAMS : integer := (g_THETAS + c_THETA_PER_BRAM - 1) / c_THETA_PER_BRAM; -- Ceiling division
     constant c_MAX_ADDR : unsigned(g_BRAM_ADDR_WIDTH - 1 downto 0) := to_unsigned((2 ** g_BRAM_ADDR_WIDTH) - 1, g_BRAM_ADDR_WIDTH);
 
@@ -69,9 +72,6 @@ architecture rtl of hough is
 
     -- Testing signals
     type t_test is array (0 to c_BRAMS - 1) of signed(35 downto 0);
-
-    signal w_sum : t_test;
-    signal w_rho : t_sum;
 
     type t_bram_addr is array (0 to c_BRAMS - 1) of std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0);
     type t_bram_data is array (0 to c_BRAMS - 1) of std_logic_vector(g_BRAM_DATA_WIDTH - 1 downto 0);
@@ -203,9 +203,6 @@ begin
 
     begin
 
-        w_sum <= (others => (others => '0'));
-        w_rho <= (others => (others => '0'));
-
         -- Default signal assignment
         n_state <= q_state;
         n_col   <= q_col;
@@ -262,6 +259,18 @@ begin
                     n_state <= s_READ;
                 end if;
 
+                -- Reset counting signals
+                n_left_votes    <= (others => '0');
+                n_right_votes   <= (others => '0');
+                n_right_rho     <= (others => '0');
+                n_left_rho      <= (others => '0');
+                n_right_theta   <= (others => '0');
+                n_left_theta    <= (others => '0');
+                n_bram_count    <= (others => '0');
+                n_top_rhos      <= (others => (others => (others => '0')));
+                n_top_thetas    <= (others => (others => (others => '0')));
+                n_top_votes     <= (others => (others => (others => '0')));
+
             when s_READ => 
 
                 if (i_EMPTY = '0') then
@@ -290,15 +299,7 @@ begin
                 n_bram_count <= (others => '0');
 
             when s_CALC =>
-
-                -- Edge of image should be black, but just in case
-                -- if (q_row = to_signed(g_HEIGHT - 1, q_row'length) and q_col = to_signed(g_WIDTH - 1, q_col'length)) then
-                --     n_count <= (others => '0');
-                --     n_state <= s_WRITE;
-                -- elsif (q_count(q_count'left downto 2) > to_unsigned(g_THETAS, q_count'length - 2)) then
-                --     n_state <= s_READ;
-                -- end if;
-
+            
                 -- q_xs, q_ys calculations occur every cycle
                 -- Increment counter to keep track of how many rho calculations have been performed, based on q_count(q_count'left downto 2)
                 n_count_calc <= q_count_calc + to_unsigned(1, q_count_calc'length);
@@ -315,8 +316,6 @@ begin
                         -- Optimization: increase COS_TABLE/SIN_TABLE size so that this condition doesn't need to be checked
                         if (v_theta < g_THETAS) then
                             n_sum(i) <= resize(q_xs * COS_TABLE(v_theta) + q_ys * SIN_TABLE(v_theta), g_TOP_BITS + g_BOT_BITS);
-                            w_sum(i) <= q_xs * COS_TABLE(v_theta);
-                            w_rho(i) <= resize(q_ys * SIN_TABLE(v_theta), g_TOP_BITS + g_BOT_BITS);
 
                         end if;
                     end loop;
@@ -354,9 +353,11 @@ begin
                             -- Also check if it was a valid address, if not, skip
                             if (unsigned(n_wr_data(i)) > unsigned(q_top_votes(i)(rank)) and (q_rd_addr(i) /= std_logic_vector(c_MAX_ADDR))) then
                                 -- Shift down lower-ranked values
-                                n_top_rhos(i)(rank+1 to g_TOP_N-1) <= q_top_rhos(i)(rank to g_TOP_N-2);
-                                n_top_thetas(i)(rank+1 to g_TOP_N-1) <= q_top_thetas(i)(rank to g_TOP_N-2);
-                                n_top_votes(i)(rank+1 to g_TOP_N-1) <= q_top_votes(i)(rank to g_TOP_N-2);
+                                if rank < g_TOP_N - 1 then
+                                    n_top_rhos(i)(rank+1 to g_TOP_N-1) <= q_top_rhos(i)(rank to g_TOP_N-2);
+                                    n_top_thetas(i)(rank+1 to g_TOP_N-1) <= q_top_thetas(i)(rank to g_TOP_N-2);
+                                    n_top_votes(i)(rank+1 to g_TOP_N-1) <= q_top_votes(i)(rank to g_TOP_N-2);
+                                end if;
                                 -- Assign current rho to top rhos
                                 n_top_rhos(i)(rank) <= std_logic_vector(resize(q_rho(i), n_top_rhos(i)(rank)'length));
                                 -- Assign current theta to top thetas

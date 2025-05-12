@@ -15,9 +15,11 @@ class my_uvm_scoreboard extends uvm_scoreboard;
     my_uvm_transaction tx_out;
     my_uvm_transaction tx_cmp;
 
+    int pixel_count = 0;
+
     function new(string name, uvm_component parent);
         super.new(name, parent);
-        tx_out    = new("tx_out");
+        tx_out = new("tx_out");
         tx_cmp = new("tx_cmp");
     endfunction: new
 
@@ -50,9 +52,10 @@ class my_uvm_scoreboard extends uvm_scoreboard;
             // use uvm_fatal to halt the simulation on error
             `uvm_info("SB_CMP", tx_out.sprint(), UVM_LOW);
             `uvm_info("SB_CMP", tx_cmp.sprint(), UVM_LOW);
-            `uvm_fatal("SB_CMP", $sformatf("Test: Failed! Expecting: %08x, Received: %08x", tx_cmp.image_pixel, tx_out.image_pixel));
+            `uvm_fatal("SB_CMP", $sformatf("Test Pixel: %08d, Failed! Expecting: %08x, Received: %08x", pixel_count, tx_cmp.image_pixel, tx_out.image_pixel));
         end else begin
-            `uvm_info("SB_CMP", $sformatf("Test: Passed! Expecting: %08x, Received: %08x", tx_cmp.image_pixel, tx_out.image_pixel), UVM_LOW);
+            `uvm_info("SB_CMP", $sformatf("Test Pixel: %08d, Passed! Expecting: %08x, Received: %08x", pixel_count, tx_cmp.image_pixel, tx_out.image_pixel), UVM_LOW);
         end
+        pixel_count += 1;
     endfunction: comparison
 endclass: my_uvm_scoreboard
