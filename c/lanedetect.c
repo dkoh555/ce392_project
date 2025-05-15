@@ -12,8 +12,8 @@
 #define high_threshold 100
 #define low_threshold 60
 
-#define ROWS 540
-#define COLS 720
+#define ROWS 120
+#define COLS 160
 
 // Hough Transform Constants
 #define X_START -COLS/2
@@ -32,6 +32,7 @@ static const float cosvals[180] = {1.0, 0.9998476951563913, 0.9993908270190958, 
 
 // Lane Line Calculation
 #define IMAGE_CENTER_X COLS/2
+#define IMAGE_CENTER_Y ROWS/2
 #define OFFSET 0.05f
 #define ANGLE 0.3f
 
@@ -668,7 +669,7 @@ void hough_transform(unsigned char *in_data, int height, int width, unsigned int
     }
 }
 
-void extract_top_lines(unsigned char *in_data, int height, int width, const unsigned int *accumulator, int *rho_indices, int *theta_indices, int *vote_counts) {
+void extract_top_lines(const unsigned int *accumulator, int *rho_indices, int *theta_indices, int *vote_counts) {
 /**
     * @brief Extracts the top-N peaks from the flattened Hough accumulator.
     *
@@ -708,46 +709,9 @@ void extract_top_lines(unsigned char *in_data, int height, int width, const unsi
             }
         }
     }
-
-    for (int i = 0; i < TOP_N; i++) {
-        // printf("Vote count: %d, rho index: %d, theta index: %d\n", vote_counts[i], rho_indices[i], theta_indices[i]);
-
-        float rho = (rho_indices[i] - RHOS / 2) * RHO_RESOLUTION;
-        float cos_t = cosvals[theta_indices[i]];
-        float sin_t = sinvals[theta_indices[i]];
-    
-        // x0, y0 in centered coordinates
-        float x0 = cos_t * rho;
-        float y0 = sin_t * rho;
-    
-        // Generate two points far along the normal vector
-        float dx = -sin_t;
-        float dy =  cos_t;
-    
-        // Compute two endpoints (in centered coords)
-        int x1 = (int)(x0 + 1000 * dx + width  / 2);
-        int y1 = (int)(y0 + 1000 * dy + height / 2);
-        int x2 = (int)(x0 - 1000 * dx + width  / 2);
-        int y2 = (int)(y0 - 1000 * dy + height / 2);
-    
-        // Bresenham-style line drawing
-        int dx_draw = abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
-        int dy_draw = -abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
-        int err = dx_draw + dy_draw;
-    
-        while (1) {
-            if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height)
-                in_data[y1 * width + x1] = 255;
-    
-            if (x1 == x2 && y1 == y2) break;
-            int e2 = 2 * err;
-            if (e2 >= dy_draw) { err += dy_draw; x1 += sx; }
-            if (e2 <= dx_draw) { err += dx_draw; y1 += sy; }
-        }
-    }
 }
 
-float calculate_center_lane(const int *rho_indices, const int *theta_indices, const int *vote_counts, int *left_rho_idx, int *left_theta_idx, int *right_rho_idx, int *right_theta_idx) {
+float calculate_center_lane(unsigned char *in_data, int height, int width, const int *rho_indices, const int *theta_indices, const int *vote_counts, int *left_rho_idx, int *left_theta_idx, int *right_rho_idx, int *right_theta_idx) {
 /**
     * @brief Computes steering correction from top-N Hough peaks.
     *
@@ -770,6 +734,8 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
     int top_left_votes = -1;
     int top_right_votes = -1;
 
+    int left_i = -1;
+    int right_i = -1;
 
     // Classify left/right lanes
     for (int i = 0; i < TOP_N; i++) {
@@ -783,6 +749,7 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
                 *left_rho_idx = rho_indices[i];
                 *left_theta_idx = theta;
                 top_left_votes = votes;
+                left_i = i;
             }
         } else if (theta >= 20 && theta <= 80 && top_right_votes <= votes) {
             if (top_right_votes < votes || 
@@ -790,13 +757,14 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
                 *right_rho_idx = rho_indices[i];
                 *right_theta_idx = theta;
                 top_right_votes = votes;
+                right_i = i;
             }
         }
     }
 
-    for (int i = 0; i < TOP_N; i++) {
+    // for (int i = 0; i < TOP_N; i++) {
         // printf("Theta: %x, Rho: %x, Votes: %x\n", theta_indices[i], rho_indices[i], vote_counts[i]);
-    }
+    // }
 
     if (*left_rho_idx == -1 || *right_rho_idx == -1) {
         printf("Error: Both lines not found\n");
@@ -805,6 +773,59 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
     } else {
         // printf("Left Found: Theta: %x, Rho: %x\n", *left_theta_idx, *left_rho_idx);
         // printf("Right Found: Theta: %x, Rho: %x\n", *right_theta_idx, *right_rho_idx);
+
+        for (int i = 0; i < TOP_N; i++) {
+            if (i == left_i || i == right_i) {
+                // printf("Vote count: %d, rho index: %d, theta index: %d\n", vote_counts[i], rho_indices[i], theta_indices[i]);
+                float rho = (rho_indices[i] - RHOS / 2) * RHO_RESOLUTION;
+                float cos_t = cosvals[theta_indices[i]];
+                float sin_t = sinvals[theta_indices[i]];
+            
+                // x0, y0 in centered coordinates
+                float x0 = cos_t * rho;
+                float y0 = sin_t * rho;
+            
+                // Generate two points far along the normal vector
+                float dx = -sin_t;
+                float dy =  cos_t;
+            
+                // Compute two endpoints (in centered coords)
+                int x1 = (int)(x0 + 1000 * dx + width  / 2);
+                int y1 = (int)(y0 + 1000 * dy + height / 2);
+                int x2 = (int)(x0 - 1000 * dx + width  / 2);
+                int y2 = (int)(y0 - 1000 * dy + height / 2);
+
+                if (i == left_i) {
+                    float left_x_intercept = x1 + (float)(0 - y1) * (x2 - x1) / (y2 - y1);
+                    // printf("Left Rho: %.2f\n", rho);
+                    // printf("Left Cos: %.2f\n", cos_t);
+                    // printf("Left Sin: %.2f\n", sin_t);
+                    // printf("Left x-intercept (at y = 0): %.2f\n", left_x_intercept);
+                }
+                if (i == right_i) {
+                    float right_x_intercept = x1 + (float)(0 - y1) * (x2 - x1) / (y2 - y1);
+                    // printf("Right Rho: %.2f\n", rho);
+                    // printf("Right Cos: %.2f\n", cos_t);
+                    // printf("Right Sin: %.2f\n", sin_t);
+                    // printf("Right x-intercept (at y = 0): %.2f\n", right_x_intercept);
+                }
+            
+                // Bresenham-style line drawing
+                int dx_draw = abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+                int dy_draw = -abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
+                int err = dx_draw + dy_draw;
+            
+                while (1) {
+                    if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height)
+                        in_data[y1 * width + x1] = 255;
+            
+                    if (x1 == x2 && y1 == y2) break;
+                    int e2 = 2 * err;
+                    if (e2 >= dy_draw) { err += dy_draw; x1 += sx; }
+                    if (e2 <= dx_draw) { err += dx_draw; y1 += sy; }
+                }
+            }
+        }
     }
 
     // Convert indices to actual rho
@@ -814,6 +835,8 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
     // Retrieve cosine values for the left and right lanes
     int cos_l = COS_TABLE[*left_theta_idx];
     int cos_r = COS_TABLE[*right_theta_idx];
+    int sin_l = SIN_TABLE[*left_theta_idx];
+    int sin_r = SIN_TABLE[*right_theta_idx];
 
     // Don't perform division if overflow could occur
     if (cos_l == 0 || cos_r == 0) {
@@ -824,50 +847,59 @@ float calculate_center_lane(const int *rho_indices, const int *theta_indices, co
     // Compute x = rho / cos(theta)
     //  This is based on the hough line equation x * cos(θ) + y * sin(θ) = rho,
     //  with y = 0 at the bottom of the image
-    int abs_left_rho_q = abs(left_rho_q);
-    int abs_right_rho_q = abs(right_rho_q);
+    // NEW CHANGE
+    int numerator_l_q = left_rho_q + ((QUANTIZE_I(IMAGE_CENTER_Y) * sin_l) >> BITS);
+    int numerator_r_q = right_rho_q + ((QUANTIZE_I(IMAGE_CENTER_Y) * sin_r) >> BITS);
+    int abs_numerator_l_q = abs(numerator_l_q);
+    int abs_numerator_r_q = abs(numerator_r_q);
     int abs_cos_l = abs(cos_l);
     int abs_cos_r = abs(cos_r);
     int left_x_q, right_x_q;
-    // If onnly one is negative
-    if (abs_left_rho_q != left_rho_q ^ abs_cos_l != cos_l) {
-        left_x_q  = -((abs_left_rho_q  ) / abs_cos_l );// << BITS;
+    // If divisor and dividend have opposite signs
+    if ((abs_numerator_l_q != numerator_l_q) != (abs_cos_l != cos_l)) {
+        left_x_q  = -((abs_numerator_l_q << BITS) / abs_cos_l );
     } else {
-        left_x_q  = ((abs_left_rho_q  ) / abs_cos_l );// << BITS;
+        left_x_q  = ((abs_numerator_l_q << BITS) / abs_cos_l );
     }
-    if (abs_right_rho_q != right_rho_q ^ abs_cos_r != cos_r) {
-        right_x_q  = -((abs_right_rho_q  ) / abs_cos_r );// << BITS;
+    if ((abs_numerator_r_q != numerator_r_q) != (abs_cos_r != cos_r)) {
+        right_x_q  = -((abs_numerator_r_q << BITS) / abs_cos_r );
     } else {
-        right_x_q  = ((abs_right_rho_q  ) / abs_cos_r );// << BITS;
+        right_x_q  = ((abs_numerator_r_q << BITS) / abs_cos_r );
     }
 
-    left_x_q = left_x_q << BITS;
-    right_x_q = right_x_q << BITS;
+    // NEW CHANGE
+    left_x_q = left_x_q + QUANTIZE_I(IMAGE_CENTER_X);
+    right_x_q = right_x_q + QUANTIZE_I(IMAGE_CENTER_X);
 
     // printf("left_x: %d, right_x: %d\n", left_x, right_x);
 
     // Estimate lane center and offset
     int lane_center_q = (left_x_q + right_x_q) / 2;
-    int offset_q = QUANTIZE_I(IMAGE_CENTER_X) - lane_center_q;
+    int image_center_q = QUANTIZE_I(IMAGE_CENTER_X);    
+    int offset_q = image_center_q - lane_center_q;
 
     // Estimate angle difference
-    int angle_error_q = QUANTIZE_I(*right_theta_idx - *left_theta_idx); //QUANTIZE_I
+    int angle_error_q = QUANTIZE_I(((*right_theta_idx + *left_theta_idx) >> 1) - 90); //QUANTIZE_I
 
     // Steering = offset * K1 + angle * K2
     int steering_q = (offset_q * OFFSET_Q + angle_error_q * ANGLE_Q) >> BITS;
 
+    // Debugging print statements
     // printf("left_rho_q: %x, right_rho_q: %x\n", left_rho_q, right_rho_q);
     // printf("cos_l: %x, cos_l: %x\n", cos_l, cos_r);
-    // printf("left_x_q: %x, right_x_q: %x\n", left_x_q, right_x_q);
-    // printf("lane_center_q: %x\n", lane_center_q);
-    // printf("offset_q: %x\n", offset_q);
-    // printf("angle_error_q: %x\n", angle_error_q);
+    // printf("abs_numerator_l_q: %x, abs_numerator_r_q: %x\n", abs_numerator_l_q, abs_numerator_r_q);
+    // printf("abs_cos_l: %x, abs_cos_l: %x\n", cos_l, cos_r);
+    // printf("left_x_q: %x, right_x_q: %x, left_x: %d, right_x: %d\n", left_x_q, right_x_q, DEQUANTIZE(left_x_q), DEQUANTIZE(right_x_q));
+    // printf("lane_center_q: %x, lane_center: %d\n", lane_center_q, DEQUANTIZE(lane_center_q));
+    // printf("image_center_q: %x, image_center: %d\n", image_center_q, DEQUANTIZE(image_center_q));
+    // printf("offset_q: %x, offset: %d\n", offset_q, DEQUANTIZE(offset_q));
+    // printf("angle_error_q: %x, angle_error: %d\n", angle_error_q, DEQUANTIZE(angle_error_q));
     // printf("steering_q: %x\n", steering_q >> BITS);
 
     // printf("Steer: %d (d) %x (h)\n", DEQUANTIZE(steering_q), DEQUANTIZE(steering_q));
 
     // Final dequantized result
-    return (float) ((steering_q >> BITS) & 0x3FF);
+    return (float) (DEQUANTIZE(steering_q) & 0x3FF);
 }
 
 
@@ -932,8 +964,8 @@ int main(int argc, char *argv[]) {
 
     save_result(output_filepath, "roi_raw.bmp", header, roi);
 
-    extract_top_lines(roi, height, width, accumulator, rho_indices, theta_indices, vote_counts);
-    float steering = calculate_center_lane(rho_indices, theta_indices, vote_counts, &left_rho_idx, &left_theta_idx, &right_rho_idx, &right_theta_idx); // roi, height, width, 255);
+    extract_top_lines(accumulator, rho_indices, theta_indices, vote_counts);
+    float steering = calculate_center_lane(roi, height, width, rho_indices, theta_indices, vote_counts, &left_rho_idx, &left_theta_idx, &right_rho_idx, &right_theta_idx); // roi, height, width, 255);
     // printf("Steering correction: %.2f\n", steering);
     // Save the lane calculations
     save_indices(output_filepath, "left_rho_idx_cmp.txt", left_rho_idx);
