@@ -6,13 +6,13 @@ use work.lanedetect_pkg.all;
 entity center_lane is
 
     generic (
-        g_HEIGHT : integer := 540;
-        g_WIDTH  : integer := 720;
+        g_HEIGHT : integer := 160;
+        g_WIDTH  : integer := 120;
         -- Resolution of Hough transform
-        g_RHO_RES_LOG   : integer := 1;     -- Clog2(Rho Resolution = 2)
-        g_RHOS          : integer := 450;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
-        g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64), also represents number of brams to be used
-        g_BRAM_ADDR_WIDTH : integer := 17;
+        g_RHO_RES_LOG   : integer := 2;     -- Clog2(Rho Resolution = 4)
+        g_RHOS          : integer := 50;    -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
+        g_THETAS        : integer := 180;   -- Tried decreasing this, decrease in accuracy was too large
+        g_BRAM_ADDR_WIDTH : integer := 10;
         -- Quantization
         g_TOP_BITS : integer := 10;
         g_BOT_BITS : integer := 10;
@@ -71,8 +71,8 @@ architecture rtl of center_lane is
     signal q_x, n_x : t_quantized;
 
     -- signal q_lane_center_q, n_lane_center_q : signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
-    signal q_offset_q, n_offset_q : signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
-    signal q_angle_q, n_angle_q : signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
+    signal q_offset, n_offset : signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
+    signal q_angle, n_angle : signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
     signal q_steering, n_steering : signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
 
     signal w_test0, w_test1, w_test2 : t_quantized;
@@ -100,8 +100,8 @@ begin
             q_shift     <= (others => (others => '0'));
             q_quotient  <= (others => (others => '0'));
             q_x         <= (others => (others => '0'));
-            q_offset_q  <= (others => '0');
-            q_angle_q   <= (others => '0');
+            q_offset  <= (others => '0');
+            q_angle   <= (others => '0');
             q_steering  <= (others => '0');
         elsif (rising_edge(i_CLK)) then
             q_state     <= n_state;
@@ -116,14 +116,14 @@ begin
             q_shift     <= n_shift;
             q_quotient  <= n_quotient;
             q_x         <= n_x;
-            q_offset_q  <= n_offset_q;
-            q_angle_q   <= n_angle_q;
+            q_offset  <= n_offset;
+            q_angle   <= n_angle;
             q_steering  <= n_steering;
         end if;
 
     end process state_seq;
 
-    state_comb : process (q_state, q_rho, q_theta, q_rho_q, q_cos_q, q_sin_q, q_num_q, q_num_q_abs, q_cos_q_abs, q_shift, q_quotient, q_x, q_offset_q, q_angle_q, q_steering, i_EMPTY, i_LEFT_RHO, i_RIGHT_RHO, i_LEFT_THETA, i_RIGHT_THETA) 
+    state_comb : process (q_state, q_rho, q_theta, q_rho_q, q_cos_q, q_sin_q, q_num_q, q_num_q_abs, q_cos_q_abs, q_shift, q_quotient, q_x, q_offset, q_angle, q_steering, i_EMPTY, i_LEFT_RHO, i_RIGHT_RHO, i_LEFT_THETA, i_RIGHT_THETA) 
 
     begin
 
@@ -139,8 +139,8 @@ begin
         n_shift     <= q_shift;
         n_quotient  <= q_quotient;
         n_x         <= q_x;
-        n_offset_q  <= q_offset_q;
-        n_angle_q   <= q_angle_q;
+        n_offset  <= q_offset;
+        n_angle   <= q_angle;
         n_steering  <= q_steering;
         o_WR_EN     <= '0';
         o_RD_EN     <= '0';
@@ -153,7 +153,7 @@ begin
             w_test2(i) <= to_signed(FIND_MSB(q_cos_q_abs(i)), g_TOP_BITS + g_BOT_BITS);
         end loop;
 
-        w_test3 <= shift_left(to_signed(c_IMAGE_CENTER_X, n_offset_q'length), g_BOT_BITS);
+        w_test3 <= shift_left(to_signed(c_IMAGE_CENTER_X, n_offset'length), g_BOT_BITS);
         w_test4 <= shift_right(q_x(0) + q_x(1), 1);
         msb_index <= FIND_MSB(test_val);  -- Should return 17
 
@@ -180,8 +180,8 @@ begin
                 n_shift     <= (others => (others => '0'));
                 n_quotient  <= (others => (others => '0'));
                 n_x         <= (others => (others => '0'));
-                n_offset_q  <= (others => '0');
-                n_angle_q   <= (others => '0');
+                n_offset  <= (others => '0');
+                n_angle   <= (others => '0');
                 n_steering  <= (others => '0');
 
             when s_PREDIVIDE0 =>
@@ -251,25 +251,27 @@ begin
                                 n_quotient(i) <= signed(std_logic_vector(q_quotient(i)) or std_logic_vector(shift_left(to_signed(1, n_quotient(i)'length), to_integer(q_shift(i)) - 1)));
                                 -- n_state <= s_DIVIDE0;
                             else
-                                n_x(i) <= shift_left(-q_quotient(i), g_BOT_BITS) when (q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1' else shift_left(q_quotient(i), g_BOT_BITS);
+                                -- Dequantized result
+                                n_x(i) <= -q_quotient(i) when (q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1' else q_quotient(i);
                                 -- n_state <= s_CALC0;
                             end if;
                         end if;
                     else
-                        n_x(i) <= shift_left(-q_quotient(i), g_BOT_BITS) when (q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1' else shift_left(q_quotient(i), g_BOT_BITS);
+                        -- Dequantized result
+                        n_x(i) <= -q_quotient(i) when (q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1' else q_quotient(i);
                         -- n_state <= s_CALC0;
                     end if;
                 end loop;
                 
             when s_CALC0 => 
                 -- Calculate offset and angle difference
-                n_offset_q <= - shift_right(q_x(0) + q_x(1), 1);
-                n_angle_q  <= shift_left(resize(shift_right(q_theta(1) + q_theta(0), 1) - to_signed(g_THETAS/2, q_theta(0)'length), g_TOP_BITS + g_BOT_BITS), g_BOT_BITS);
-                n_state <= s_CALC1;
+                n_offset    <= to_signed(0, n_offset'length) - shift_right(q_x(0) + q_x(1), 1);
+                n_angle     <= resize(shift_right(q_theta(1) + q_theta(0), 1) - to_signed(g_THETAS/2, q_theta(0)'length), g_TOP_BITS + g_BOT_BITS);
+                n_state     <= s_CALC1;
 
             when s_CALC1 =>
                 -- Calculate steering   
-                n_steering <= resize(shift_right(q_offset_q * g_OFFSET + q_angle_q * g_ANGLE, g_BOT_BITS * 2), n_steering'length);
+                n_steering <= resize(shift_right(q_offset * g_OFFSET + q_angle * g_ANGLE, g_BOT_BITS), n_steering'length);
                 n_state <= s_WRITE;
 
             when s_WRITE =>
