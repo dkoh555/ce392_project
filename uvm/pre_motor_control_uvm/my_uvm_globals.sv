@@ -2,9 +2,9 @@
 `define __GLOBALS__
 
 // Support for multiple images
-localparam string STEERING_OUT_NAMES [0:1] = '{"../c/images/out/real0/steering_out.txt", "../c/images/out/real1/steering_out.txt"};
-localparam string STEERING_CMP_NAMES [0:1] = '{"../c/images/out/real0/steering_cmp.txt", "../c/images/out/real1/steering_cmp.txt"};
-localparam string IMG_IN_NAMES  [0:1] = '{"../c/images/out/real0/roi_raw.bmp", "../c/images/out/real1/roi_raw.bmp"};
+localparam string STEERING_OUT_NAMES [0:1] = '{"../c/images/out/real10/steering_out.txt", "../c/images/out/real11/steering_out.txt"};
+localparam string STEERING_CMP_NAMES [0:1] = '{"../c/images/out/real10/steering_cmp.txt", "../c/images/out/real11/steering_cmp.txt"};
+localparam string IMG_IN_NAMES  [0:1] = '{"../c/images/real10.bmp", "../c/images/real11.bmp"};
 
 // UVM Globals
 localparam int IMG_WIDTH = 160;
