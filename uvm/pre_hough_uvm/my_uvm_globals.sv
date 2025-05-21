@@ -18,12 +18,12 @@ localparam int HYSTERESIS_HIGH_THRESHOLD = 100;
 localparam int HYSTERESIS_LOW_THRESHOLD = 60;
 localparam int ROI = 60;
 
-localparam int RHO_RES_LOG = 1;    
-localparam int RHOS = 450;  
+localparam int RHO_RES_LOG = 2;    
+localparam int RHOS = 50;  
 localparam int THETAS = 180;  
 localparam int TOP_N = 16;   
-localparam int BRAM_ADDR_WIDTH = 17; 
-localparam int BRAM_DATA_WIDTH = 19; 
+localparam int BRAM_ADDR_WIDTH = 10; 
+localparam int BRAM_DATA_WIDTH = 10; 
 localparam int BOT_BITS = 10;
 localparam int TOP_BITS = 10; 
 
