@@ -25,8 +25,6 @@ module my_uvm_tb;
         .g_BRAM_DATA_WIDTH(BRAM_DATA_WIDTH),
         .g_BOT_BITS(BOT_BITS),
         .g_TOP_BITS(TOP_BITS),
-        .g_BUFFS(BUFFS),
-        .g_BUFFS_LOG(BUFFS_LOG),
         .g_OFFSET(OFFSET),
         .g_ANGLE(ANGLE)
     ) lanedetect_top_inst (

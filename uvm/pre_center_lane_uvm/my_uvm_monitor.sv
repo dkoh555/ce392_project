@@ -55,6 +55,7 @@ class my_uvm_monitor_output extends uvm_monitor;
     virtual task run_phase(uvm_phase phase);
         int n_bytes;
         my_uvm_transaction tx_out;
+        int file_count = 0;
 
         // wait for reset
         @(posedge vif.reset)
@@ -63,30 +64,30 @@ class my_uvm_monitor_output extends uvm_monitor;
         tx_out = my_uvm_transaction::type_id::create(.name("tx_out"), .contxt(get_full_name()));
 
         // There should be an equal number of out files for each value
-        foreach (left_rho_out_files[i]) begin
 
-            vif.out_rd_en = 1'b0;
+        vif.out_rd_en = 1'b0;
 
-            forever begin
-                @(negedge vif.clock)
-                begin
-                    if (vif.out_empty == 1'b0) begin
-                        $fwrite(left_rho_out_files[i], "%h", vif.out_left_rho_dout);
-                        $fwrite(left_theta_out_files[i], "%h", vif.out_left_theta_dout);
-                        $fwrite(right_rho_out_files[i], "%h", vif.out_right_rho_dout);
-                        $fwrite(right_theta_out_files[i], "%h", vif.out_right_theta_dout);
-                        tx_out.left_rho = vif.out_left_rho_dout;
-                        tx_out.left_theta = vif.out_left_theta_dout;
-                        tx_out.right_rho = vif.out_right_rho_dout;
-                        tx_out.right_theta = vif.out_right_theta_dout;
-                        mon_ap_output.write(tx_out);
-                        vif.out_rd_en = 1'b1;
-                    end else begin
-                        vif.out_rd_en = 1'b0;
-                    end
+        forever begin
+            @(negedge vif.clock)
+            begin
+                if (vif.out_empty == 1'b0) begin
+                    $fwrite(left_rho_out_files[file_count], "%h", vif.out_left_rho_dout);
+                    $fwrite(left_theta_out_files[file_count], "%h", vif.out_left_theta_dout);
+                    $fwrite(right_rho_out_files[file_count], "%h", vif.out_right_rho_dout);
+                    $fwrite(right_theta_out_files[file_count], "%h", vif.out_right_theta_dout);
+                    tx_out.left_rho = vif.out_left_rho_dout;
+                    tx_out.left_theta = vif.out_left_theta_dout;
+                    tx_out.right_rho = vif.out_right_rho_dout;
+                    tx_out.right_theta = vif.out_right_theta_dout;
+                    mon_ap_output.write(tx_out);
+                    vif.out_rd_en = 1'b1;
+                    file_count += 1;
+                end else begin
+                    vif.out_rd_en = 1'b0;
                 end
             end
         end
+
     endtask: run_phase
 
     virtual function void final_phase(uvm_phase phase);

@@ -8,7 +8,7 @@ class my_uvm_monitor_output extends uvm_monitor;
     uvm_analysis_port#(my_uvm_transaction) mon_ap_output;
 
     virtual my_uvm_if vif;
-    int steering_out_files [0:1];
+    int steering_out_files [0:0];
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -20,7 +20,7 @@ class my_uvm_monitor_output extends uvm_monitor;
             (.scope("ifs"), .name("vif"), .val(vif)));
         mon_ap_output = new(.name("mon_ap_output"), .parent(this));
 
-        foreach (steering_out_files[i]) begin
+        foreach (STEERING_OUT_NAMES[i]) begin
             steering_out_files[i] = $fopen(STEERING_OUT_NAMES[i], "wb");
             if ( !steering_out_files[i] ) begin
                 `uvm_fatal("MON_OUT_BUILD", $sformatf("Failed to open output file %s...", STEERING_OUT_NAMES[i]));
@@ -45,12 +45,10 @@ class my_uvm_monitor_output extends uvm_monitor;
             @(negedge vif.clock)
             begin
                 if (vif.out_empty == 1'b0) begin
-                    $fwrite(steering_out_files[file_count], "%h", vif.out_steering_dout);
-                    // THIS STILL NEEDS TO BE CHANGED
+                    $fwrite(steering_out_files[file_count], "%h\n", vif.out_steering_dout);
                     tx_out.steering = vif.out_steering_dout;
                     mon_ap_output.write(tx_out);
                     vif.out_rd_en = 1'b1;
-                    file_count += 1;
                 end else begin
                     vif.out_rd_en = 1'b0;
                 end
@@ -76,7 +74,7 @@ class my_uvm_monitor_compare extends uvm_monitor;
 
     uvm_analysis_port#(my_uvm_transaction) mon_ap_compare;
     virtual my_uvm_if vif;
-    int steering_cmp_files [0:1];
+    int steering_cmp_files [0:0];
 
     function new(string name, uvm_component parent);
         super.new(name, parent);

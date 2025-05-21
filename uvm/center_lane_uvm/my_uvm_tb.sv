@@ -10,7 +10,7 @@ module my_uvm_tb;
 
     my_uvm_if vif();
 
-    lanedetect_top #(
+    center_lane_top #(
         .g_FIFO_BUFFER_SIZE(64),
         .g_WIDTH(IMG_WIDTH),
         .g_HEIGHT(IMG_HEIGHT),
@@ -24,20 +24,21 @@ module my_uvm_tb;
         .g_BRAM_ADDR_WIDTH(BRAM_ADDR_WIDTH),
         .g_BRAM_DATA_WIDTH(BRAM_DATA_WIDTH),
         .g_BOT_BITS(BOT_BITS),
-        .g_TOP_BITS(TOP_BITS)
-    ) lanedetect_top_inst (
+        .g_TOP_BITS(TOP_BITS),
+        .g_OFFSET(OFFSET),
+        .g_ANGLE(ANGLE)
+    ) center_lane_top_inst (
         .i_CLK(vif.clock),
         .i_RST(vif.reset), 
-        .i_PIXEL(vif.in_din),
         .o_FULL(vif.in_full),
         .i_WR_EN(vif.in_wr_en),
-        // .o_PIXEL(vif.out_dout),
+        .i_LEFT_RHO(vif.left_rho),
+        .i_LEFT_THETA(vif.left_theta),
+        .i_RIGHT_RHO(vif.right_rho),
+        .i_RIGHT_THETA(vif.right_theta),
         .o_EMPTY(vif.out_empty),
         .i_RD_EN(vif.out_rd_en),
-        .o_LEFT_RHO(vif.out_left_rho_dout),
-        .o_LEFT_THETA(vif.out_left_theta_dout),
-        .o_RIGHT_RHO(vif.out_right_rho_dout),
-        .o_RIGHT_THETA(vif.out_right_theta_dout)
+        .o_STEERING(vif.out_steering_dout)
     );
 
     initial begin
