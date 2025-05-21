@@ -10,9 +10,9 @@ entity hough is
         g_HEIGHT : integer := 540;
         g_WIDTH  : integer := 720;
         -- Resolution of Hough Transform
-        g_RHO_RES_LOG   : integer := 1;     -- Clog2(Rho Resolution = 2)
-        g_RHOS          : integer := 450;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
-        g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64), also represents number of brams to be used
+        g_RHO_RES_LOG   : integer := 2;     -- Clog2(Rho Resolution = 4)
+        g_RHOS          : integer := 50;    -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
+        g_THETAS        : integer := 180;   -- With smaller images, reducing this resolution decreases accuracy significantly
         g_TOP_N         : integer := 16;    -- Number of top voted Rhos and Theta values to consider
         g_BRAM_ADDR_WIDTH : integer := 10;  -- Maximum size based on g_BRAM_DATA_WIDTH and maximum BRAM size
         g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(sqrt(g_HEIGHT^2 + g_WIDTH^2)), maximum count of votes for each Rho is the diagonal of the image
@@ -333,7 +333,7 @@ begin
                         -- q_count the offset based on the current theta
                         -- Could be source of errors, since n_rd_addr should be unsigned representation
                         if (v_theta < g_THETAS) then
-                            n_rd_addr(i) <= std_logic_vector(resize(q_rho(i) + to_signed(v_offset, q_rho'length), n_rd_addr(i)'length));
+                            n_rd_addr(i) <= std_logic_vector(resize(unsigned(q_rho(i)) + to_unsigned(v_offset, q_rho(i)'length), n_rd_addr(i)'length));
                         else
                             n_rd_addr(i) <= (others => '1');
                         end if;
@@ -442,7 +442,11 @@ begin
 
                 if (i_FULL = '0') then
                     n_state <= s_IDLE;
-                    o_WR_EN <= '1';                 
+                    if (unsigned(q_right_votes) /= to_unsigned(0, q_right_votes'length) and unsigned(q_left_votes) /= to_unsigned(0, q_left_votes'length)) then
+                        o_WR_EN <= '1';     
+                    else
+                        o_WR_EN <= '0';
+                    end if;            
                 end if;
         end case;
 
