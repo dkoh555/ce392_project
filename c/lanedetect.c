@@ -639,21 +639,21 @@ void hough_transform(unsigned char *in_data, int height, int width, unsigned int
                     int rho = DEQUANTIZE(sum)+ (RHOS >> 1);
 
                     // TESTING CODE
-                    // if (theta >= THETAS - 5 && theta < THETAS) {
-                    //     printf("Pixel: %d, %d\n", y, x);
-                    //     printf("Theta: %d\n", theta);
-                    //     printf("Pixel Data: %x\n", in_data[index]);
-                    //     printf("centered_x: %x\n",  centered_x);
-                    //     printf("centered_y: %x\n",  centered_y);
-                    //     printf("xs: %x\n",  xs);
-                    //     printf("ys: %x\n",  ys);
-                    //     printf("sum_x: %x\n", (int32_t)xs * COS_TABLE[theta]);
-                    //     printf("sum_y: %x\n", (int32_t)ys * SIN_TABLE[theta]);
-                    //     printf("Sum: %x\n",  sum);
-                    //     printf("Rho: %x\n", rho);
-                    //     printf("Buffer: %x\n\n", (theta % 8)* RHOS + rho);
-                    //     getchar();
-                    // }
+                    if (theta >= 0 && theta < THETAS) {
+                        printf("Pixel: %d, %d\n", y, x);
+                        printf("Theta: %d\n", theta);
+                        printf("Pixel Data: %x\n", in_data[index]);
+                        printf("centered_x: %x\n",  centered_x);
+                        printf("centered_y: %x\n",  centered_y);
+                        printf("xs: %x\n",  xs);
+                        printf("ys: %x\n",  ys);
+                        printf("sum_x: %x\n", (int32_t)xs * COS_TABLE[theta]);
+                        printf("sum_y: %x\n", (int32_t)ys * SIN_TABLE[theta]);
+                        printf("Sum: %x\n",  sum);
+                        printf("Rho: %x\n", rho);
+                        printf("Buffer: %x\n\n", (theta % 20)* RHOS + rho);
+                        getchar();
+                    }
 
                     if (rho >= 0 && rho < RHOS) {
                         accum_buff[rho * THETAS + theta]++;
