@@ -14,7 +14,7 @@ entity center_lane is
         g_THETAS        : integer := 180;   -- Tried decreasing this, decrease in accuracy was too large
         g_BRAM_ADDR_WIDTH : integer := 10;
         -- Quantization
-        g_TOP_BITS : integer := 10;
+        g_TOP_BITS : integer := 8;
         g_BOT_BITS : integer := 10;
         -- Steering
         g_OFFSET : integer := 51; 
@@ -123,7 +123,7 @@ begin
 
     end process state_seq;
 
-    state_comb : process (q_state, q_rho, q_theta, q_rho_q, q_cos_q, q_sin_q, q_num_q, q_num_q_abs, q_cos_q_abs, q_shift, q_quotient, q_x, q_offset, q_angle, q_steering, i_EMPTY, i_LEFT_RHO, i_RIGHT_RHO, i_LEFT_THETA, i_RIGHT_THETA) 
+    state_comb : process (q_state, q_rho, q_theta, q_rho_q, q_cos_q, q_sin_q, q_num_q, q_num_q_abs, q_cos_q_abs, q_shift, q_quotient, q_x, q_offset, q_angle, q_steering, i_EMPTY, i_LEFT_RHO, i_RIGHT_RHO, i_LEFT_THETA, i_RIGHT_THETA, i_FULL) 
 
     begin
 
@@ -252,13 +252,21 @@ begin
                                 -- n_state <= s_DIVIDE0;
                             else
                                 -- Dequantized result
-                                n_x(i) <= -q_quotient(i) when (q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1' else q_quotient(i);
+                                if ((q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1') then
+                                    n_x(i) <= -q_quotient(i);
+                                else 
+                                    n_x(i) <= q_quotient(i);
+                                end if;
                                 -- n_state <= s_CALC0;
                             end if;
                         end if;
                     else
                         -- Dequantized result
-                        n_x(i) <= -q_quotient(i) when (q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1' else q_quotient(i);
+                        if ((q_num_q(i)(q_num_q(i)'high) xor q_cos_q(i)(q_cos_q(i)'high)) = '1') then
+                            n_x(i) <= -q_quotient(i);
+                        else 
+                            n_x(i) <= q_quotient(i);
+                        end if;
                         -- n_state <= s_CALC0;
                     end if;
                 end loop;
