@@ -1,0 +1,5 @@
+# Ignore any file beginning with “wlf”
+.nfs*
+
+# Ignore any folders that represents the synthesis revisions
+/rev*
