@@ -21,11 +21,11 @@ localparam int ROI = 60;
 localparam int RHO_RES_LOG = 2;    
 localparam int RHOS = 50;  
 localparam int THETAS = 180;  
-localparam int TOP_N = 16;   
+localparam int TOP_N = 4;   
 localparam int BRAM_ADDR_WIDTH = 10; 
 localparam int BRAM_DATA_WIDTH = 10; 
 localparam int BOT_BITS = 10;
-localparam int TOP_BITS = 10;
+localparam int TOP_BITS = 8;
 
 localparam int OFFSET = 51;
 localparam int ANGLE = 307;
