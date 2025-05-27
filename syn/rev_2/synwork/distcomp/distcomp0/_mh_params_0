@@ -1,3 +1,0 @@
-top work.fifo
-parameter FIFO_DATA_WIDTH 24;
-parameter FIFO_BUFFER_SIZE 64;

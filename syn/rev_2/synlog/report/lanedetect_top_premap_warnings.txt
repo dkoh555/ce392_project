@@ -1,3 +1,0 @@
-@W: FA406 |Environment variable QUARTUS_ROOTDIR not set. Cannot determine PAR version.
-@W: FA352 |Not using the Clearbox flow might affect timing correlation and Quality of Results (QoR).
-@W: MT529 :"/home/nmh6120/ce387/CE392/rtl/grayscale.vhd":45:8:45:9|Found inferred clock lanedetect_top|i_CLK which controls 103 sequential elements including grayscale_inst.q_grayscale_pixel[15:8]. This clock has no specified timing constraint which may prevent conversion of gated or generated clocks and may adversely impact design performance. 

@@ -1,3 +1,0 @@
-lanedetect_top.grayscale_inst work grayscale.rtl 0 2
-lanedetect_top.input_fifo_inst work fifo 0 1
-lanedetect_top.grayscale_fifo_inst work fifo 0 1

@@ -1,1 +1,0 @@
--distcompmode -link    -encrypt       -top work.lanedetect_top.rtl -osyn /home/nmh6120/ce387/CE392/syn/rev_2/synwork/lanedetect_top_comp.srs /home/nmh6120/ce387/CE392/syn/rev_2/synwork//distcomp/distcomp0/distcomp0.srs /home/nmh6120/ce387/CE392/syn/rev_2/synwork//distcomp/distcomp1/distcomp1.srs /home/nmh6120/ce387/CE392/syn/rev_2/synwork//distcomp/distcomp2/distcomp2.srs    
