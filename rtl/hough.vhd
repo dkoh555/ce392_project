@@ -13,16 +13,13 @@ entity hough is
         g_RHO_RES_LOG   : integer := 2;     -- Clog2(Rho Resolution = 4)
         g_RHOS          : integer := 50;    -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
         g_THETAS        : integer := 180;   -- With smaller images, reducing this resolution decreases accuracy significantly
-        g_TOP_N         : integer := 16;    -- Number of top voted Rhos and Theta values to consider
+        g_TOP_N         : integer := 4;    -- Number of top voted Rhos and Theta values to consider
         g_BRAM_ADDR_WIDTH : integer := 10;  -- Maximum size based on g_BRAM_DATA_WIDTH and maximum BRAM size
         g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(sqrt(g_HEIGHT^2 + g_WIDTH^2)), maximum count of votes for each Rho is the diagonal of the image
         -- Quantization
-        g_BOT_BITS : integer := 10;
         g_TOP_BITS : integer := 10;
+        g_BOT_BITS : integer := 8
         -- Parallelizatin of calculations
-        -- Deprecated
-        g_BUFFS    : integer := 8;
-        g_BUFFS_LOG : integer := 3          -- Clog2(g_BUFFS)
     );
 
     port (
@@ -54,7 +51,7 @@ architecture rtl of hough is
     constant c_BRAMS : integer := (g_THETAS + c_THETA_PER_BRAM - 1) / c_THETA_PER_BRAM; -- Ceiling division
     constant c_MAX_ADDR : unsigned(g_BRAM_ADDR_WIDTH - 1 downto 0) := to_unsigned((2 ** g_BRAM_ADDR_WIDTH) - 1, g_BRAM_ADDR_WIDTH);
 
-    type t_state is (s_IDLE, s_READ, s_CALC, s_FIND, s_WRITE);
+    type t_state is (s_IDLE, s_READ, s_CALC, s_FIND, s_FINDL0, s_FINDL1, s_FINDR0, s_FINDR1, s_WRITE);
     signal q_state, n_state : t_state;
 
     signal q_col, n_col : signed(9 downto 0);
@@ -66,6 +63,10 @@ architecture rtl of hough is
     signal q_count, n_count : unsigned(g_BRAM_ADDR_WIDTH - 1 downto 0);
     signal q_count_calc, n_count_calc : unsigned(4 downto 0);
     type t_sum is array (0 to c_BRAMS - 1) of signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
+    -- t_index can go up to c_THETA_PER_BRAM * c_BRAMS, which can exceed g_THETAS depending on different generics
+    subtype t_theta is integer range 0 to c_THETA_PER_BRAM * c_BRAMS;
+    type t_theta_array is array (0 to c_BRAMS - 1) of t_theta;
+    signal q_theta, n_theta : t_theta_array;
     signal q_sum, n_sum : t_sum;
     signal q_rho, n_rho : t_sum;
     signal w_centered_x, w_centered_y : signed(g_TOP_BITS + g_BOT_BITS - 1 downto 0);
@@ -90,6 +91,8 @@ architecture rtl of hough is
     signal q_top_rhos, n_top_rhos : t_top_rhos_bram;
     signal q_top_thetas, n_top_thetas : t_top_rhos_bram;
     signal q_top_votes, n_top_votes : t_top_votes_bram;
+    signal q_lhs, n_lhs : signed(g_BRAM_ADDR_WIDTH - 1 downto 0);
+    signal q_rhs, n_rhs : signed(g_BRAM_ADDR_WIDTH - 1 downto 0);
 
     -- Writing signals
     signal q_left_votes, n_left_votes : std_logic_vector(g_BRAM_DATA_WIDTH - 1 downto 0);
@@ -149,6 +152,7 @@ begin
             q_ys    <= (others => '0');
             q_count <= (others => '0');
             q_count_calc <= (others => '0');
+            q_theta <= (others => 0);
             q_sum   <= (others => (others => '0'));
             q_rho   <= (others => (others => '0'));
             q_rd_addr       <= (others => (others => '0'));
@@ -165,6 +169,8 @@ begin
             q_right_rho     <= (others => '0');
             q_right_theta   <= (others => '0');
             q_bram_count    <= (others => '0');
+            q_lhs           <= (others => '0');
+            q_rhs           <= (others => '0');
         elsif (rising_edge(i_CLK)) then
             q_state <= n_state;
             q_col   <= n_col;
@@ -173,6 +179,7 @@ begin
             q_ys    <= n_ys;
             q_count <= n_count;
             q_count_calc <= n_count_calc;
+            q_theta <= n_theta;
             q_sum   <= n_sum;
             q_rho   <= n_rho;
             q_rd_addr       <= n_rd_addr;
@@ -189,11 +196,13 @@ begin
             q_right_rho     <= n_right_rho;
             q_right_theta   <= n_right_theta;
             q_bram_count    <= n_bram_count;
+            q_lhs           <= n_lhs;
+            q_rhs           <= n_rhs;
         end if;
 
     end process state_seq;
 
-    state_comb : process (i_EMPTY, i_PIXEL, i_FULL, q_state, q_col, q_row, w_centered_x, w_centered_y, q_xs, q_ys, q_count, q_count_calc, q_sum, q_rho, q_rd_addr, q_wr_addr, q_wr_en, n_wr_data, q_wr_data, w_rd_data, q_top_rhos, q_top_thetas, q_top_votes, q_left_votes, q_right_votes, q_right_rho, q_left_rho, q_right_theta, q_left_theta, q_bram_count) 
+    state_comb : process (i_EMPTY, i_PIXEL, i_FULL, q_state, q_col, q_row, w_centered_x, w_centered_y, q_xs, q_ys, q_count, q_count_calc, q_theta, q_sum, q_rho, q_rd_addr, q_wr_addr, q_wr_en, n_wr_data, q_wr_data, w_rd_data, q_top_rhos, q_top_thetas, q_top_votes, q_left_votes, q_right_votes, q_right_rho, q_left_rho, q_right_theta, q_left_theta, q_bram_count, q_lhs, q_rhs) 
     
         variable v_theta : integer := 0;
         variable v_offset : integer := 0;
@@ -214,6 +223,7 @@ begin
         n_ys <= shift_right(w_centered_y, g_RHO_RES_LOG);
         n_count <= q_count;
         n_count_calc <= q_count_calc;
+        n_theta <= q_theta;
         n_sum   <= q_sum;
         n_rho   <= q_rho;
         n_rd_addr <= q_rd_addr;
@@ -231,6 +241,8 @@ begin
         n_right_theta <= q_right_theta;
         n_left_theta <= q_left_theta;
         n_bram_count <= q_bram_count;
+        n_lhs        <= q_lhs;
+        n_rhs        <= q_rhs;
 
         -- Default output assignment
         o_RD_EN <= '0';
@@ -279,7 +291,7 @@ begin
                     if (i_PIXEL = std_logic_vector(to_unsigned(0, i_PIXEL'length))) then
                         -- If end of image reached, go to write
                         if (q_row = to_signed(g_HEIGHT - 1, q_row'length) and q_col = to_signed(g_WIDTH - 1, q_col'length)) then
-                            n_state <= s_FIND;
+                            n_state <= s_FINDL0;
                         -- If end of row reached, reset column count and increment row counter
                         elsif (q_col = to_signed(g_WIDTH - 1, 10)) then
                             n_row <= q_row + to_signed(1, 10);
@@ -307,51 +319,51 @@ begin
                 if (q_count_calc = to_unsigned(0, q_count_calc'length)) then
                     for i in 0 to c_BRAMS - 1 loop
                         -- xs * COS_TABLE[theta] + ys * SIN_TABLE[theta]
-                        v_theta := to_integer(q_count) + c_THETA_PER_BRAM * i;
+                        n_theta(i) <= to_integer(q_count) + c_THETA_PER_BRAM * i;
                         -- Since each BRAM holds g_RHOS (how many rhos) values for c_THETA_PER_BRAM (how many thetas) theta values,
                         --  Each BRAM is in charge of q_count(q_count'left downto 2) + c_THETA_PER_BRAM * i in the COS_TABLE.
                         --  For example, BRAM 0 is in charge of 0 to c_THETA_PER_BRAM - 1 values of theta, and all of the associated rhos.
                         --      BRAM 0: THETA = 0 - RHO 0 to g_RHOS - 1, THETA = 1 - RHO 0 to g_RHOS - 1, ...
                         --               BRAM 1 is in charge of c_THETA_PER_BRAM to c_THETA_PER_BRAM + c_THETA_PER_BRAM - 1
-                        -- Optimization: increase COS_TABLE/SIN_TABLE size so that this condition doesn't need to be checked
-                        if (v_theta < g_THETAS) then
-                            n_sum(i) <= resize(q_xs * COS_TABLE(v_theta) + q_ys * SIN_TABLE(v_theta), g_TOP_BITS + g_BOT_BITS);
-
-                        end if;
+                        -- v_theta should be within bounds of COS_TABLE and SIN_TABLE.
+                    end loop;
+                elsif (q_count_calc = to_unsigned(1, q_count_calc'length)) then
+                    for i in 0 to c_BRAMS - 1 loop
+                        -- Next optimization: make g_TOP_BITS = 8, so a single DSP block can handle both 18x18 multiplies
+                        n_sum(i) <= resize(q_xs * COS_TABLE(q_theta(i)) + q_ys * SIN_TABLE(q_theta(i)), g_TOP_BITS + g_BOT_BITS);
                     end loop;
                 -- On second cycle of calculation
-                elsif (q_count_calc = to_unsigned(1, q_count_calc'length)) then
+                elsif (q_count_calc = to_unsigned(2, q_count_calc'length)) then
                     for i in 0 to c_BRAMS - 1 loop
                         n_rho(i) <= DEQUANTIZE(q_sum(i)) + to_signed(g_RHOS/2, n_rho(i)'length);                           
                     end loop;
-                elsif (q_count_calc = to_unsigned(2, q_count_calc'length)) then
+                elsif (q_count_calc = to_unsigned(3, q_count_calc'length)) then
                     for i in 0 to c_BRAMS - 1 loop
                         -- v_offset
                         v_offset := to_integer(q_count) * g_RHOS;
-                        v_theta := to_integer(q_count) + c_THETA_PER_BRAM * i;
                         -- Address is q_count * g_RHOS + rho value
                         -- q_count the offset based on the current theta
-                        -- Could be source of errors, since n_rd_addr should be unsigned representation
-                        if (v_theta < g_THETAS) then
+                        if (q_theta(i) < g_THETAS) then
                             n_rd_addr(i) <= std_logic_vector(resize(unsigned(q_rho(i)) + to_unsigned(v_offset, q_rho(i)'length), n_rd_addr(i)'length));
                         else
                             n_rd_addr(i) <= (others => '1');
                         end if;
                     end loop;
-                elsif (q_count_calc = to_unsigned(3, q_count_calc'length)) then
+                elsif (q_count_calc = to_unsigned(4, q_count_calc'length)) then
                     -- Do nothing, wait for read address to propogate first
-                else
+                elsif (q_count_calc = to_unsigned(5, q_count_calc'length)) then
                     for i in 0 to c_BRAMS - 1 loop
                         n_wr_addr(i) <= q_rd_addr(i);
                         n_wr_en(i) <= '1';
                         n_wr_data(i) <= std_logic_vector(resize(unsigned(w_rd_data(i)) + to_unsigned(1, w_rd_data(i)'length), n_wr_data(i)'length));
-                        v_theta := to_integer(q_count) + c_THETA_PER_BRAM * i;
-
+                    end loop;
+                else
+                    for i in 0 to c_BRAMS - 1 loop
                         -- If the vote count of the current rho is greater than the top rho
                         for rank in 0 to g_TOP_N-1 loop
                             -- If the vote count of the current rho is greater than the vote at this rank
                             -- Also check if it was a valid address, if not, skip
-                            if (unsigned(n_wr_data(i)) > unsigned(q_top_votes(i)(rank)) and (q_rd_addr(i) /= std_logic_vector(c_MAX_ADDR))) then
+                            if (unsigned(q_wr_data(i)) > unsigned(q_top_votes(i)(rank)) and (q_rd_addr(i) /= std_logic_vector(c_MAX_ADDR))) then
                                 -- Shift down lower-ranked values
                                 if rank < g_TOP_N - 1 then
                                     n_top_rhos(i)(rank+1 to g_TOP_N-1) <= q_top_rhos(i)(rank to g_TOP_N-2);
@@ -361,7 +373,7 @@ begin
                                 -- Assign current rho to top rhos
                                 n_top_rhos(i)(rank) <= std_logic_vector(resize(q_rho(i), n_top_rhos(i)(rank)'length));
                                 -- Assign current theta to top thetas
-                                n_top_thetas(i)(rank) <= std_logic_vector(to_unsigned(v_theta, n_top_thetas(i)(rank)'length));
+                                n_top_thetas(i)(rank) <= std_logic_vector(to_unsigned(q_theta(i), n_top_thetas(i)(rank)'length));
                                 -- Assign current votes to top votes
                                 n_top_votes(i)(rank) <= n_wr_data(i);
                                 -- Exit after inserting the new vote
@@ -389,13 +401,65 @@ begin
 
                 end if;
 
-            when s_FIND => 
+            when s_FINDL0 => 
 
                 -- End of image reached, reset column and row count
                 n_row <= (others => '0');
                 n_col <= (others => '0');
 
-                -- Optimization: Do this in parallel instead of in series
+                -- Classify left/right lanes
+
+                -- Thetas corresponding to the left lane:
+                --  If the current theta/rho pair has equal or more votes than the previous best
+                if (unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) >= to_unsigned(100, g_BRAM_ADDR_WIDTH - 1) and
+                    unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) <= to_unsigned(160, g_BRAM_ADDR_WIDTH - 1)) then
+                    n_state <= s_FINDL1;
+                else
+                    n_state <= s_FINDR0;
+                end if;
+
+                n_lhs <= signed(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) - to_signed(130, g_BRAM_ADDR_WIDTH);
+                n_rhs <= signed(q_left_theta) - to_signed(130, g_BRAM_ADDR_WIDTH);
+
+            when s_FINDL1 => 
+
+                if (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) > unsigned(q_left_votes) or
+                    (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) = unsigned(q_left_votes) and ABS_SIGNED(q_lhs) < ABS_SIGNED(q_rhs))) then
+                        n_left_votes <= std_logic_vector(q_top_votes(to_integer(q_bram_count))(to_integer(q_count)));
+                        n_left_rho <= std_logic_vector(q_top_rhos(to_integer(q_bram_count))(to_integer(q_count)));
+                        n_left_theta <= std_logic_vector(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count)));
+                end if;
+
+                n_state <= s_FINDR0;
+            
+            when s_FINDR0 =>
+
+                if (unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) >= to_unsigned(20, g_BRAM_ADDR_WIDTH - 1) and
+                    unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) <= to_unsigned(80, g_BRAM_ADDR_WIDTH - 1)) then
+                    n_state <= s_FINDR1;
+                else
+                    n_state <= s_FIND;
+                end if;
+
+                n_lhs <= signed(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) - to_signed(50, g_BRAM_ADDR_WIDTH);
+                n_rhs <= signed(q_right_theta) - to_signed(50, g_BRAM_ADDR_WIDTH);
+
+            when s_FINDR1 => 
+                    
+                if (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) > unsigned(q_right_votes) or
+                    (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) = unsigned(q_right_votes) and ABS_SIGNED(q_lhs) < ABS_SIGNED(q_rhs))) then
+                        n_right_votes <= std_logic_vector(q_top_votes(to_integer(q_bram_count))(to_integer(q_count)));
+                        n_right_rho <= std_logic_vector(q_top_rhos(to_integer(q_bram_count))(to_integer(q_count)));
+                        n_right_theta <= std_logic_vector(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count)));
+                end if;
+
+                n_state <= s_FIND;
+
+            when s_FIND =>
+
+                -- By default, go back to first find state
+                n_state <= s_FINDL0;
+
                 -- If all top values in a given bram have been exhausted, move on to the next one
                 if (q_count = to_unsigned(g_TOP_N - 1, q_count'length)) then
                     -- If all top values in all brams have been exhausted, 
@@ -403,39 +467,12 @@ begin
                         -- Move to writing to FIFOs
                         n_state <= s_WRITE;
                     end if;
-                    -- Increment bram count and top values count                        
+                    -- Increment bram count and top values count                
                     n_bram_count <= q_bram_count + to_unsigned(1, q_bram_count'length);
                     n_count <= (others => '0');
                 else
                     -- Increment top values count
                     n_count <= q_count + to_unsigned(1, q_count'length);
-                end if;
-
-                -- Classify left/right lanes
-                
-
-                -- Thetas corresponding to the left lane:
-                --  If the current theta/rho pair has equal or more votes than the previous best
-                if (unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) >= to_unsigned(100, g_BRAM_ADDR_WIDTH - 1) and
-                    unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) <= to_unsigned(160, g_BRAM_ADDR_WIDTH - 1)) then
-                    if (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) > unsigned(q_left_votes) or
-                        (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) = unsigned(q_left_votes) and 
-                        ABS_SIGNED(signed(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) - to_signed(130, g_BRAM_ADDR_WIDTH)) < ABS_SIGNED(signed(q_left_theta) - to_signed(130, g_BRAM_ADDR_WIDTH)))) then
-                            n_left_votes <= std_logic_vector(q_top_votes(to_integer(q_bram_count))(to_integer(q_count)));
-                            n_left_rho <= std_logic_vector(q_top_rhos(to_integer(q_bram_count))(to_integer(q_count)));
-                            n_left_theta <= std_logic_vector(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count)));
-                    end if;
-                end if;
-
-                if (unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) >= to_unsigned(20, g_BRAM_ADDR_WIDTH - 1) and
-                unsigned(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) <= to_unsigned(80, g_BRAM_ADDR_WIDTH - 1)) then
-                    if (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) > unsigned(q_right_votes) or
-                        (unsigned(q_top_votes(to_integer(q_bram_count))(to_integer(q_count))) = unsigned(q_right_votes) and 
-                        ABS_SIGNED(signed(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count))) - to_signed(50, g_BRAM_ADDR_WIDTH)) < ABS_SIGNED(signed(q_right_theta) - to_signed(50, g_BRAM_ADDR_WIDTH)))) then
-                            n_right_votes <= std_logic_vector(q_top_votes(to_integer(q_bram_count))(to_integer(q_count)));
-                            n_right_rho <= std_logic_vector(q_top_rhos(to_integer(q_bram_count))(to_integer(q_count)));
-                            n_right_theta <= std_logic_vector(q_top_thetas(to_integer(q_bram_count))(to_integer(q_count)));
-                    end if;
                 end if;
 
             when s_WRITE =>
