@@ -1,18 +1,29 @@
 #--  Synopsys, Inc.
 #--  Version O-2018.09-SP1
-#--  Project file /home/nmh6120/ce387/CE392/syn/lanedetect.prj
-#--  Written on Mon Apr 14 13:06:07 2025
+#--  Project file /home/nmh6120/ce392/syn/lanedetect.prj
+#--  Written on Mon May 26 15:14:39 2025
 
 
 #project files
+add_file -verilog -vlog_std sysv "../rtl/bram.sv"
+add_file -vhdl -lib work "../rtl/center_lane.vhd"
+add_file -vhdl -lib work "../rtl/center_lane_top.vhd"
+add_file -vhdl -lib work "../rtl/diff.vhd"
 add_file -verilog -vlog_std sysv "../rtl/fifo.sv"
+add_file -vhdl -lib work "../rtl/gaussian_blur.vhd"
 add_file -vhdl -lib work "../rtl/grayscale.vhd"
+add_file -vhdl -lib work "../rtl/hough.vhd"
+add_file -vhdl -lib work "../rtl/hysteresis.vhd"
+add_file -vhdl -lib work "../rtl/lanedetect_pkg.vhd"
 add_file -vhdl -lib work "../rtl/lanedetect_top.vhd"
+add_file -vhdl -lib work "../rtl/non_max_suppression.vhd"
+add_file -vhdl -lib work "../rtl/roi.vhd"
+add_file -vhdl -lib work "../rtl/sobel.vhd"
 
 
 
-#implementation: "rev_2"
-impl -add rev_2 -type fpga
+#implementation: "rev_1"
+impl -add rev_1 -type fpga
 
 #
 #implementation attributes
@@ -24,10 +35,10 @@ set_option -project_relative_includes 1
 set_option -job par_1 -add par
 
 #device options
-set_option -technology CYCLONEV
-set_option -part 5CSEBA6
-set_option -package UI23
-set_option -speed_grade -7
+set_option -technology KINTEX7
+set_option -part XC7K70T
+set_option -package FBG676
+set_option -speed_grade -1
 set_option -part_companion ""
 
 #compilation/mapping options
@@ -36,26 +47,31 @@ set_option -use_fsm_explorer 0
 # hdl_compiler_options
 set_option -distributed_compile 1
 
-# altera_options
-set_option -rw_check_on_ram 1
-
 # mapper_without_write_options
-set_option -frequency 100
+set_option -frequency auto
 set_option -srs_instrumentation 1
 
 # mapper_options
-set_option -write_verilog 0
+set_option -write_verilog 1
 set_option -write_vhdl 0
 
-# Intel STRATIX
+# xilinx_options
+set_option -rw_check_on_ram 1
+set_option -optimize_ngc 1
+
+# Xilinx Virtex2
 set_option -run_prop_extract 1
-set_option -maxfan 30
+set_option -maxfan 10000
 set_option -disable_io_insertion 0
 set_option -pipe 1
 set_option -update_models_cp 0
 set_option -retiming 0
 set_option -no_sequential_opt 0
 set_option -fix_gated_and_generated_clocks 1
+
+# Xilinx Kintex7
+set_option -use_vivado 1
+set_option -enable_prepacking 1
 
 # sequential_optimization_options
 set_option -symbolic_fsm_compiler 1
@@ -72,7 +88,7 @@ set_option -auto_infer_blackbox 0
 set_option -write_apr_constraint 1
 
 #set result format/file last
-project -result_file "rev_2/lanedetect_top.vqm"
+project -result_file "rev_1/sobel.edf"
 
 #design plan options
-impl -active "rev_2"
+impl -active "rev_1"
