@@ -18,12 +18,12 @@ entity lanedetect_top is
         g_RHO_RES_LOG   : integer := 2;     -- Clog2(Rho Resolution = 2)
         g_RHOS          : integer := 50;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
         g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64)
-        g_TOP_N         : integer := 16;    -- Number of top voted Rhos and Theta values to consider
+        g_TOP_N         : integer := 4;    -- Number of top voted Rhos and Theta values to consider
         g_BRAM_ADDR_WIDTH : integer := 10;  -- Clog2(g_RHOS * g_THETAS), size of BRAM to hold votes
         g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(g_HEIGHT * g_WIDTH), maximum count of votes for each Rho
         -- Quantization
         g_BOT_BITS : integer := 10;
-        g_TOP_BITS : integer := 10;
+        g_TOP_BITS : integer := 8;
         -- Steering
         g_OFFSET : integer := 51; 
         g_ANGLE : integer := 307
@@ -217,15 +217,15 @@ architecture rtl of lanedetect_top is
             g_HEIGHT : integer := 540;
             g_WIDTH  : integer := 720;
             -- Resolution of Hough Transform
-            g_RHO_RES_LOG   : integer := 1;     -- Clog2(Rho Resolution = 2)
-            g_RHOS          : integer := 450;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
+            g_RHO_RES_LOG   : integer := 2;     -- Clog2(Rho Resolution = 2)
+            g_RHOS          : integer := 50;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
             g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64)
             g_TOP_N         : integer := 16;    -- Number of top voted Rhos and Theta values to consider
-            g_BRAM_ADDR_WIDTH : integer := 17;  -- Clog2(g_RHOS * g_THETAS), size of BRAM to hold votes
-            g_BRAM_DATA_WIDTH : integer := 19;  -- Clog2(g_HEIGHT * g_WIDTH), maximum count of votes for each Rho
+            g_BRAM_ADDR_WIDTH : integer := 10;  -- Clog2(g_RHOS * g_THETAS), size of BRAM to hold votes
+            g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(g_HEIGHT * g_WIDTH), maximum count of votes for each Rho
             -- Quantization
             g_BOT_BITS : integer := 10;
-            g_TOP_BITS : integer := 6
+            g_TOP_BITS : integer := 8
         );
 
         port (
@@ -259,8 +259,8 @@ architecture rtl of lanedetect_top is
             g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64), also represents number of brams to be used
             g_BRAM_ADDR_WIDTH : integer := 17;
             -- Quantization
-            g_TOP_BITS : integer := 10;
             g_BOT_BITS : integer := 10;
+            g_TOP_BITS : integer := 8;
             -- Steering
             g_OFFSET : integer := 51; 
             g_ANGLE : integer := 307
