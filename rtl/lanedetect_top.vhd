@@ -26,7 +26,12 @@ entity lanedetect_top is
         g_TOP_BITS : integer := 8;
         -- Steering
         g_OFFSET : integer := 51; 
-        g_ANGLE : integer := 307
+        g_ANGLE : integer := 307;
+        -- Motor Control
+        g_PWM_WIDTH : integer := 8;         -- PWM resolution (8-bit = 256 levels)
+        g_PWM_PERIOD : integer := 256;      -- PWM period in clock cycles
+        g_BASE_SPEED : integer := 128;      -- Base motor speed (50% duty cycle)
+        g_MAX_STEERING_MAG : integer := 512 -- Maximum steering magnitude for calibration
     );
 
     port (
@@ -38,18 +43,13 @@ entity lanedetect_top is
         o_FULL      : out   std_logic;
         i_WR_EN     : in    std_logic;
 
-        -- Output pixel data
-        o_EMPTY     : out   std_logic;
-        i_RD_EN     : in    std_logic;
-        -- o_PIXEL     : out   std_logic_vector(7 downto 0)
-
-        -- Output steering data
-        -- o_LEFT_RHO      : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0);
-        -- o_LEFT_THETA    : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0);
-        -- o_RIGHT_RHO     : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0);
-        -- o_RIGHT_THETA   : out std_logic_vector(g_BRAM_ADDR_WIDTH - 1 downto 0)
+        -- Output control signals
+        o_EMPTY         : out   std_logic;
+        i_RD_EN         : in    std_logic;
         
-        o_STEERING      : out std_logic_vector(g_BOT_BITS - 1 downto 0)
+        -- Direct PWM motor outputs
+        o_LEFT_MOTOR_PWM    : out   std_logic;
+        o_RIGHT_MOTOR_PWM   : out   std_logic
     );
 
 end entity lanedetect_top;
@@ -285,6 +285,10 @@ architecture rtl of lanedetect_top is
     
     end component center_lane;
 
+    -- SystemVerilog motor_control module declaration
+    -- Note: This will be a SystemVerilog module, VHDL just needs to know the interface
+
+    -- All existing signals remain the same...
     signal w_input_rd_en : std_logic;
     signal w_input_empty : std_logic;
     signal w_input_data : std_logic_vector(23 downto 0);
@@ -371,8 +375,13 @@ architecture rtl of lanedetect_top is
     signal w_center_lane_empty : std_logic;
     signal w_center_lane_dout : std_logic_vector(g_BOT_BITS - 1 downto 0);
 
+    -- New signals for motor control
+    signal w_motor_control_valid : std_logic;
+    signal w_motor_control_ready : std_logic;
+
 begin
 
+    -- All existing component instantiations remain exactly the same...
     input_fifo_inst : fifo
         generic map (
             FIFO_DATA_WIDTH     => 24,
@@ -793,8 +802,35 @@ begin
             empty   => w_center_lane_empty
         );
 
+
+
+    -- NEW: Motor control instantiation (SystemVerilog module)
+    motor_control_inst : entity work.motor_control
+        generic map (
+            STEERING_WIDTH => g_BOT_BITS,
+            PWM_WIDTH => g_PWM_WIDTH,
+            PWM_PERIOD => g_PWM_PERIOD,
+            BASE_SPEED => g_BASE_SPEED,
+            MAX_STEERING_MAG => g_MAX_STEERING_MAG
+        )
+        port map (
+            clk => i_CLK,
+            reset => i_RST,
+            i_steering => w_center_lane_dout,
+            i_valid => w_motor_control_valid,
+            o_ready => w_motor_control_ready,
+            o_left_motor_pwm => o_LEFT_MOTOR_PWM,
+            o_right_motor_pwm => o_RIGHT_MOTOR_PWM
+        );
+
+    -- Control logic for motor control interface
+    -- Generate valid signal when data is available and motor control is ready
+    w_motor_control_valid <= (not w_center_lane_empty) and w_motor_control_ready;
+    w_center_lane_rd_en <= w_motor_control_valid;  -- Read when we send valid data
+
+    -- Motor control output full signal logic
+    -- No longer needed since we're outputting directly
+
     o_EMPTY <= w_center_lane_empty;
-    w_center_lane_rd_en <= i_RD_EN;
-    o_STEERING <= w_center_lane_dout; 
 
 end architecture rtl;
