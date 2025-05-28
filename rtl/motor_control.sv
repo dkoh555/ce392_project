@@ -1,52 +1,48 @@
 module motor_control #(
     parameter STEERING_WIDTH = 10,   // Default to g_BOT_BITS = 10
-    parameter MOTOR_WIDTH = 8,       // Width of the motor control signals
-    parameter BASE_SPEED = 128,      // Base motor speed (middle range of 8-bit value)
+    parameter PWM_WIDTH = 8,         // PWM resolution (8-bit = 256 levels)
+    parameter PWM_PERIOD = 256,      // PWM period in clock cycles
+    parameter BASE_SPEED = 128,      // Base motor speed (50% duty cycle)
     parameter MAX_STEERING_MAG = 512 // Maximum steering magnitude for calibration
 ) (
     input  logic                         clk,
     input  logic                         reset,
     
-    // Input FIFO signals (from center_lane component)
+    // Input signals (from center_lane component)
     input  logic [STEERING_WIDTH-1:0]    i_steering,
-    input  logic                         i_empty,
-    output logic                         o_rd_en,
+    input  logic                         i_valid,     // Data valid signal
+    output logic                         o_ready,     // Ready to accept new data
     
-    // Output FIFO signals for left motor
-    output logic [MOTOR_WIDTH-1:0]       o_left_motor,
-    input  logic                         i_left_full,
-    output logic                         o_left_wr_en,
-    
-    // Output FIFO signals for right motor
-    output logic [MOTOR_WIDTH-1:0]       o_right_motor,
-    input  logic                         i_right_full,
-    output logic                         o_right_wr_en
+    // Direct PWM outputs to motors
+    output logic                         o_left_motor_pwm,
+    output logic                         o_right_motor_pwm
 );
 
     // State machine definition
     typedef enum logic [1:0] {
         S_IDLE,
         S_PROCESS,
-        S_WRITE
+        S_RUNNING
     } state_t;
     
     state_t state, next_state;
     
-    // Internal registers
-    logic signed [STEERING_WIDTH-1:0] steering_signed;
-    logic [MOTOR_WIDTH-1:0] left_motor_reg, right_motor_reg;
+    // PWM generation registers
+    logic [PWM_WIDTH-1:0] pwm_counter;
+    logic [PWM_WIDTH-1:0] left_duty_cycle;
+    logic [PWM_WIDTH-1:0] right_duty_cycle;
     
-    // Convert 2's complement steering to signed value
+    // Motor control registers
+    logic signed [STEERING_WIDTH-1:0] steering_signed;
+    logic [PWM_WIDTH-1:0] left_speed_reg, right_speed_reg;
+    
+    // Convert input steering to signed value
     always_comb begin
-        // Check if MSB is set (negative value)
-        if (i_steering[STEERING_WIDTH-1])
-            steering_signed = -signed'({1'b0, ~i_steering[STEERING_WIDTH-2:0]} + 1'b1);
-        else
-            steering_signed = signed'(i_steering);
+        steering_signed = signed'(i_steering);
     end
     
     // State machine sequential logic
-    always_ff @(posedge clk or posedge reset) begin
+    always_ff @(posedge clk) begin
         if (reset) begin
             state <= S_IDLE;
         end else begin
@@ -58,27 +54,24 @@ module motor_control #(
     always_comb begin
         // Default values
         next_state = state;
-        o_rd_en = 1'b0;
-        o_left_wr_en = 1'b0;
-        o_right_wr_en = 1'b0;
+        o_ready = 1'b0;
         
         case (state)
             S_IDLE: begin
-                if (!i_empty) begin
-                    o_rd_en = 1'b1;
+                o_ready = 1'b1;  // Ready to accept new steering data
+                if (i_valid) begin
                     next_state = S_PROCESS;
                 end
             end
             
             S_PROCESS: begin
-                next_state = S_WRITE;
+                next_state = S_RUNNING;
             end
             
-            S_WRITE: begin
-                if (!i_left_full && !i_right_full) begin
-                    o_left_wr_en = 1'b1;
-                    o_right_wr_en = 1'b1;
-                    next_state = S_IDLE;
+            S_RUNNING: begin
+                o_ready = 1'b1;  // Can accept new data while running
+                if (i_valid) begin
+                    next_state = S_PROCESS;  // Process new steering data
                 end
             end
             
@@ -86,11 +79,11 @@ module motor_control #(
         endcase
     end
     
-    // Motor control logic
-    always_ff @(posedge clk or posedge reset) begin
+    // Motor speed calculation logic
+    always_ff @(posedge clk) begin
         if (reset) begin
-            left_motor_reg <= BASE_SPEED;
-            right_motor_reg <= BASE_SPEED;
+            left_speed_reg <= BASE_SPEED;
+            right_speed_reg <= BASE_SPEED;
         end 
         else if (state == S_PROCESS) begin
             // Steering algorithm:
@@ -106,31 +99,86 @@ module motor_control #(
             else
                 limited_steering = steering_signed;
             
-            // Scale steering to motor control range
-            logic signed [MOTOR_WIDTH-1:0] steering_adjust;
-            steering_adjust = (limited_steering * BASE_SPEED) / MAX_STEERING_MAG;
+            // Scale steering to PWM control range
+            // Use wider intermediate calculation to avoid overflow
+            logic signed [STEERING_WIDTH+PWM_WIDTH-1:0] steering_product;
+            logic signed [PWM_WIDTH-1:0] steering_adjust;
+            
+            steering_product = limited_steering * signed'(BASE_SPEED);
+            steering_adjust = steering_product / signed'(MAX_STEERING_MAG);
             
             // Adjust motor speeds based on steering
             if (limited_steering > 0) begin
-                // Turn right - reduce right motor
-                left_motor_reg <= BASE_SPEED;
-                right_motor_reg <= BASE_SPEED - unsigned'(steering_adjust);
-            end
-            else if (limited_steering < 0) begin
-                // Turn left - reduce left motor
-                left_motor_reg <= BASE_SPEED - unsigned'(-steering_adjust);
-                right_motor_reg <= BASE_SPEED;
-            end
-            else begin
+                // Turn right - reduce right motor speed
+                logic signed [PWM_WIDTH-1:0] right_speed_calc;
+                right_speed_calc = signed'(BASE_SPEED) - steering_adjust;
+                
+                left_speed_reg <= BASE_SPEED;
+                // Ensure speed doesn't go negative or exceed maximum
+                if (right_speed_calc < 0)
+                    right_speed_reg <= '0;
+                else if (right_speed_calc >= PWM_PERIOD)
+                    right_speed_reg <= PWM_PERIOD - 1;
+                else
+                    right_speed_reg <= unsigned'(right_speed_calc);
+                    
+            end else if (limited_steering < 0) begin
+                // Turn left - reduce left motor speed  
+                logic signed [PWM_WIDTH-1:0] left_speed_calc;
+                left_speed_calc = signed'(BASE_SPEED) + steering_adjust; // steering_adjust is negative
+                
+                right_speed_reg <= BASE_SPEED;
+                // Ensure speed doesn't go negative or exceed maximum
+                if (left_speed_calc < 0)
+                    left_speed_reg <= '0;
+                else if (left_speed_calc >= PWM_PERIOD)
+                    left_speed_reg <= PWM_PERIOD - 1;
+                else
+                    left_speed_reg <= unsigned'(left_speed_calc);
+                    
+            end else begin
                 // Go straight
-                left_motor_reg <= BASE_SPEED;
-                right_motor_reg <= BASE_SPEED;
+                left_speed_reg <= BASE_SPEED;
+                right_speed_reg <= BASE_SPEED;
             end
         end
     end
     
-    // Output assignments
-    assign o_left_motor = left_motor_reg;
-    assign o_right_motor = right_motor_reg;
+    // Update duty cycles from speed registers
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            left_duty_cycle <= BASE_SPEED;
+            right_duty_cycle <= BASE_SPEED;
+        end else begin
+            left_duty_cycle <= left_speed_reg;
+            right_duty_cycle <= right_speed_reg;
+        end
+    end
+    
+    // PWM counter - free running counter for PWM generation
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            pwm_counter <= '0;
+        end else begin
+            if (pwm_counter >= PWM_PERIOD - 1) begin
+                pwm_counter <= '0;
+            end else begin
+                pwm_counter <= pwm_counter + 1;
+            end
+        end
+    end
+    
+    // PWM generation using shift register approach
+    // Generate PWM signals by comparing counter with duty cycle
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            o_left_motor_pwm <= 1'b0;
+            o_right_motor_pwm <= 1'b0;
+        end else begin
+            // PWM output is high when counter is less than duty cycle
+            o_left_motor_pwm <= (pwm_counter < left_duty_cycle);
+            o_right_motor_pwm <= (pwm_counter < right_duty_cycle);
+        end
+    end
     
 endmodule
