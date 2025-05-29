@@ -2,9 +2,9 @@
 `define __GLOBALS__
 
 // Support for multiple images
-localparam string STEERING_OUT_NAMES [0:1] = '{"../c/images/out/real10/steering_out.txt", "../c/images/out/real11/steering_out.txt"};
-localparam string STEERING_CMP_NAMES [0:1] = '{"../c/images/out/real10/steering_cmp.txt", "../c/images/out/real11/steering_cmp.txt"};
-localparam string IMG_IN_NAMES  [0:1] = '{"../c/images/real10.bmp", "../c/images/real11.bmp"};
+localparam string STEERING_OUT_NAMES [0:2] = '{"../c/images/out/real21/steering_out.txt",  "../c/images/out/real22/steering_out.txt",  "../c/images/out/testlane0/steering_out.txt"  };
+localparam string STEERING_CMP_NAMES [0:2] = '{"../c/images/out/real21/steering_cmp.txt",  "../c/images/out/real22/steering_cmp.txt",  "../c/images/out/testlane0/steering_cmp.txt"  };
+localparam string IMG_IN_NAMES  [0:2]      = '{"../c/images/real21.bmp",                   "../c/images/real22.bmp",                   "../c/images/testlane0.bmp"                   };
 
 // UVM Globals
 localparam int IMG_WIDTH = 160;
@@ -16,7 +16,7 @@ localparam int BMP_DATA_SIZE = (IMG_WIDTH * IMG_HEIGHT * BYTES_PER_PIXEL);
 localparam int CLOCK_PERIOD = 10;
 localparam int HYSTERESIS_HIGH_THRESHOLD = 100;
 localparam int HYSTERESIS_LOW_THRESHOLD = 60;
-localparam int ROI = 60;
+localparam int ROI = 40;
 
 localparam int RHO_RES_LOG = 2;    
 localparam int RHOS = 50;  

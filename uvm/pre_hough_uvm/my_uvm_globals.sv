@@ -16,7 +16,7 @@ localparam int BMP_DATA_SIZE = (IMG_WIDTH * IMG_HEIGHT * BYTES_PER_PIXEL);
 localparam int CLOCK_PERIOD = 10;
 localparam int HYSTERESIS_HIGH_THRESHOLD = 100;
 localparam int HYSTERESIS_LOW_THRESHOLD = 60;
-localparam int ROI = 60;
+localparam int ROI = 40;
 
 localparam int RHO_RES_LOG = 2;    
 localparam int RHOS = 50;  

@@ -8,7 +8,7 @@ class my_uvm_monitor_output extends uvm_monitor;
     uvm_analysis_port#(my_uvm_transaction) mon_ap_output;
 
     virtual my_uvm_if vif;
-    int steering_out_files [0:1];
+    int steering_out_files [0:2];
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -76,7 +76,7 @@ class my_uvm_monitor_compare extends uvm_monitor;
 
     uvm_analysis_port#(my_uvm_transaction) mon_ap_compare;
     virtual my_uvm_if vif;
-    int steering_cmp_files [0:1];
+    int steering_cmp_files [0:2];
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
