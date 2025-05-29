@@ -33,7 +33,7 @@ static const float cosvals[180] = {1.0, 0.9998476951563913, 0.9993908270190958, 
 // static const float cosvals[90] = {1.000000000000000, 0.999390827019096, 0.997564050259824, 0.994521895368273, 0.990268068741570, 0.984807753012208, 0.978147600733806, 0.970295726275996, 0.961261695938319, 0.951056516295154, 0.939692620785908, 0.927183854566787, 0.913545457642601, 0.898794046299167, 0.882947592858927, 0.866025403784439, 0.848048096156426, 0.829037572555042, 0.809016994374947, 0.788010753606722, 0.766044443118978, 0.743144825477394, 0.719339800338651, 0.694658370458997, 0.669130606358858, 0.642787609686539, 0.615661475325658, 0.587785252292473, 0.559192903470747, 0.529919264233205, 0.500000000000000, 0.469471562785891, 0.438371146789077, 0.406736643075800, 0.374606593415912, 0.342020143325669, 0.309016994374947, 0.275637355816999, 0.241921895599668, 0.207911690817759, 0.173648177666930, 0.139173100960066, 0.104528463267653, 0.069756473744125, 0.034899496702501, 0.000000000000000, -0.034899496702501, -0.069756473744125, -0.104528463267653, -0.139173100960065, -0.173648177666930, -0.207911690817759, -0.241921895599668, -0.275637355816999, -0.309016994374947, -0.342020143325669, -0.374606593415912, -0.406736643075800, -0.438371146789078, -0.469471562785891, -0.500000000000000, -0.529919264233205, -0.559192903470747, -0.587785252292473, -0.615661475325658, -0.642787609686539, -0.669130606358858, -0.694658370458997, -0.719339800338651, -0.743144825477394, -0.766044443118978, -0.788010753606722, -0.809016994374947, -0.829037572555042, -0.848048096156426, -0.866025403784439, -0.882947592858927, -0.898794046299167, -0.913545457642601, -0.927183854566787, -0.939692620785908, -0.951056516295154, -0.961261695938319, -0.970295726275996, -0.978147600733806, -0.984807753012208, -0.990268068741570, -0.994521895368273, -0.997564050259824, -0.999390827019096};
 
 // Lane Line Detection
-#define TOP_N 16
+#define TOP_N 100
 
 // Lane Line Calculation
 #define IMAGE_CENTER_X COLS/2
@@ -587,7 +587,7 @@ void region_of_interest(unsigned char *in_data, int height, int width, unsigned 
     
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (y > (height * 1) / 2) {
+            if (y > (height) / 3) {
                 // Black out top half
                 out_data[y * width + x] = 0;
             } else {
@@ -639,21 +639,21 @@ void hough_transform(unsigned char *in_data, int height, int width, unsigned int
                     int rho = DEQUANTIZE(sum)+ (RHOS >> 1);
 
                     // TESTING CODE
-                    if (theta >= 0 && theta < THETAS) {
-                        printf("Pixel: %d, %d\n", y, x);
-                        printf("Theta: %d\n", theta);
-                        printf("Pixel Data: %x\n", in_data[index]);
-                        printf("centered_x: %x\n",  centered_x);
-                        printf("centered_y: %x\n",  centered_y);
-                        printf("xs: %x\n",  xs);
-                        printf("ys: %x\n",  ys);
-                        printf("sum_x: %x\n", (int32_t)xs * COS_TABLE[theta]);
-                        printf("sum_y: %x\n", (int32_t)ys * SIN_TABLE[theta]);
-                        printf("Sum: %x\n",  sum);
-                        printf("Rho: %x\n", rho);
-                        printf("Buffer: %x\n\n", (theta % 20)* RHOS + rho);
-                        getchar();
-                    }
+                    // if (theta >= 0 && theta < THETAS) {
+                    //     printf("Pixel: %d, %d\n", y, x);
+                    //     printf("Theta: %d\n", theta);
+                    //     printf("Pixel Data: %x\n", in_data[index]);
+                    //     printf("centered_x: %x\n",  centered_x);
+                    //     printf("centered_y: %x\n",  centered_y);
+                    //     printf("xs: %x\n",  xs);
+                    //     printf("ys: %x\n",  ys);
+                    //     printf("sum_x: %x\n", (int32_t)xs * COS_TABLE[theta]);
+                    //     printf("sum_y: %x\n", (int32_t)ys * SIN_TABLE[theta]);
+                    //     printf("Sum: %x\n",  sum);
+                    //     printf("Rho: %x\n", rho);
+                    //     printf("Buffer: %x\n\n", (theta % 20)* RHOS + rho);
+                    //     getchar();
+                    // }
 
                     if (rho >= 0 && rho < RHOS) {
                         accum_buff[rho * THETAS + theta]++;
@@ -768,8 +768,16 @@ float calculate_center_lane(unsigned char *in_data, int height, int width, const
         // printf("Theta: %x, Rho: %x, Votes: %x\n", theta_indices[i], rho_indices[i], vote_counts[i]);
     // }
 
-    if (*left_rho_idx == -1 || *right_rho_idx == -1) {
+    if (*left_rho_idx == -1 && *right_rho_idx == -1) {
         printf("Error: Both lines not found\n");
+        // Can't compute correction if both lines not found
+        return 0.0f;
+    } else if (*left_rho_idx == -1 ) {
+        printf("Error: Left lane not found\n");
+        // Can't compute correction if both lines not found
+        return 0.0f;
+    } else if (*left_rho_idx == -1 ) {
+        printf("Error: Right lane not found\n");
         // Can't compute correction if both lines not found
         return 0.0f;
     } else {
@@ -887,6 +895,163 @@ float calculate_center_lane(unsigned char *in_data, int height, int width, const
     return (float) (steering & 0x3FF);
 }
 
+void overlay_og_img(struct pixel *rgb_data, int height, int width, const int *rho_indices, const int *theta_indices, const int *vote_counts) {
+/**
+    * @brief Overlays detected lines on the original RGB image.
+    *
+    * Draws red lines on the input RGB image corresponding to the lines
+    * detected by the Hough transform.
+    *
+    * @param rgb_data       Pointer to the original RGB image data.
+    * @param height         Height of the image.
+    * @param width          Width of the image.
+    * @param rho_indices    Array of rho indices from extract_top_lines.
+    * @param theta_indices  Array of theta indices from extract_top_lines.
+    * @param vote_counts    Array of vote counts from extract_top_lines.
+*/
+
+    // Copied in from calculate center lane
+    int left_rho_idx = -1;
+    int left_theta_idx = -1;
+    int right_rho_idx = -1;
+    int right_theta_idx = -1;
+
+    int top_left_votes = -1;
+    int top_right_votes = -1;
+
+    int left_i = -1;
+    int right_i = -1;
+
+    // Classify left/right lanes
+    for (int i = 0; i < TOP_N; i++) {
+        int theta = theta_indices[i];
+        int rho = rho_indices[i];
+        int votes = vote_counts[i];
+        // Only update if the new theta value is closer to 130 (theta - 130 is smaller)
+        if (theta >= 100 && theta <= 160 && top_left_votes <= votes) {
+            if (top_left_votes < votes || 
+                (abs(theta - 130) < abs(left_theta_idx - 130) && top_left_votes == votes)) {
+                left_rho_idx = rho_indices[i];
+                left_theta_idx = theta;
+                top_left_votes = votes;
+                left_i = i;
+            }
+        } else if (theta >= 20 && theta <= 80 && top_right_votes <= votes) {
+            if (top_right_votes < votes || 
+                (abs(theta - 50) < abs(right_theta_idx - 50) && top_right_votes == votes)) {
+                right_rho_idx = rho_indices[i];
+                right_theta_idx = theta;
+                top_right_votes = votes;
+                right_i = i;
+            }
+        }
+    }
+    
+    // Process each detected line
+    for (int i = 0; i < TOP_N; i++) {
+        // Skip lines with minimal votes
+        // if (vote_counts[i] < 10) {
+        //     continue;
+        // }
+        // Skip lines that aren't left or right lanes
+        if (i != left_i && i != right_i) {
+            continue;
+        }
+        
+        // Convert indices to actual values
+        float rho = (rho_indices[i] - RHOS / 2) * RHO_RESOLUTION;
+        float cos_t = cosvals[theta_indices[i]];
+        float sin_t = sinvals[theta_indices[i]];
+        
+        // Calculate line origin point in centered coordinates
+        float x0 = cos_t * rho;
+        float y0 = sin_t * rho;
+        
+        // Calculate line direction vector (perpendicular to normal)
+        float dx = -sin_t;
+        float dy = cos_t;
+        
+        // Compute two endpoints (in image coordinates)
+        int x1 = (int)(x0 + 1000 * dx + width / 2);
+        int y1 = (int)(y0 + 1000 * dy + height / 2);
+        int x2 = (int)(x0 - 1000 * dx + width / 2);
+        int y2 = (int)(y0 - 1000 * dy + height / 2);
+        
+        // Bresenham's line algorithm for drawing
+        int dx_draw = abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+        int dy_draw = -abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
+        int err = dx_draw + dy_draw;
+        
+        while (1) {
+            // If point is within image bounds, color it red
+            if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height) {
+                int idx = y1 * width + x1;
+                // Set pixel to red (R=255, G=0, B=0)
+                rgb_data[idx].r = 255;
+                rgb_data[idx].g = 0;
+                rgb_data[idx].b = 0;
+            }
+            
+            // Break once we've reached the endpoint
+            if (x1 == x2 && y1 == y2) break;
+            
+            // Update coordinates
+            int e2 = 2 * err;
+            if (e2 >= dy_draw) { err += dy_draw; x1 += sx; }
+            if (e2 <= dx_draw) { err += dx_draw; y1 += sy; }
+        }
+    }
+}
+
+void write_color_bmp(const char *filename, const unsigned char *header, const struct pixel *rgb_data) {
+/**
+    * @brief Writes a color RGB image to disk as a 24-bit BMP file.
+    *
+    * Writes the RGB image data directly to a BMP file without any conversion,
+    * since the input data is already in the correct RGB format.
+    *
+    * @param filename  Name of the output BMP file.
+    * @param header    Pointer to the 54-byte BMP header.
+    * @param rgb_data  Pointer to RGB image data (array of struct pixel).
+*/
+    // Open file for writing in binary mode
+    FILE *file = fopen(filename, "wb");
+    if (!file) {
+        fprintf(stderr, "Error: Could not open file %s for writing.\n", filename);
+        return;
+    }
+
+    // Extract width and height from BMP header
+    int w = *(int *)&header[18];
+    int h = *(int *)&header[22];
+    int size = w * h;
+
+    // Write BMP header and pixel data to file
+    fwrite(header, sizeof(unsigned char), 54, file);
+    fwrite(rgb_data, sizeof(struct pixel), size, file);
+
+    // Clean up
+    fclose(file);
+}
+
+void save_color_result(const char *filepath, char *filename, const unsigned char *header, const struct pixel *rgb_data) {
+/**
+    * @brief Creates a full filepath and saves color RGB image data using write_color_bmp.
+    *
+    * Combines the directory path and filename, then calls write_color_bmp to save the RGB image.
+    *
+    * @param filepath  Directory path where the file should be saved.
+    * @param filename  Name of the output file.
+    * @param header    Pointer to the 54-byte BMP header.
+    * @param rgb_data  Pointer to RGB image data (array of struct pixel).
+*/
+    char *final_filepath = malloc(strlen(filepath) + strlen(filename) + 1);
+    strcpy(final_filepath, filepath);
+    strcat(final_filepath, filename);
+    write_color_bmp(final_filepath, header, rgb_data);
+    free(final_filepath);
+}
+
 
 int main(int argc, char *argv[]) {
     
@@ -946,9 +1111,7 @@ int main(int argc, char *argv[]) {
     hysteresis_filter(nms, height, width, thresholded);
     region_of_interest(thresholded, height, width, roi);
     hough_transform(roi, height, width, accumulator);
-
     save_result(output_filepath, "roi_raw.bmp", header, roi);
-
     extract_top_lines(accumulator, rho_indices, theta_indices, vote_counts);
     float steering = calculate_center_lane(roi, height, width, rho_indices, theta_indices, vote_counts, &left_rho_idx, &left_theta_idx, &right_rho_idx, &right_theta_idx); // roi, height, width, 255);
     // printf("Steering correction: %.2f\n", steering);
@@ -957,7 +1120,6 @@ int main(int argc, char *argv[]) {
     save_indices(output_filepath, "left_theta_idx_cmp.txt", left_theta_idx);
     save_indices(output_filepath, "right_rho_idx_cmp.txt", right_rho_idx);
     save_indices(output_filepath, "right_theta_idx_cmp.txt", right_theta_idx);
-
     save_indices(output_filepath, "steering_cmp.txt", steering);
 
     // Save the output images
@@ -967,6 +1129,8 @@ int main(int argc, char *argv[]) {
     save_result(output_filepath, "nms.bmp", header, nms);
     save_result(output_filepath, "thresholded.bmp", header, thresholded);
     save_result(output_filepath, "roi.bmp", header, roi);
+    overlay_og_img(rgb_data, height, width, rho_indices, theta_indices, vote_counts);
+    save_color_result(output_filepath, "overlay.bmp", header, rgb_data);
     // save_result(output_filepath, "accumulator.bmp", header, accumulator);
 
     // Cleanup
