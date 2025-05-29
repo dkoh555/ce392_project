@@ -18,7 +18,7 @@ entity lanedetect_top is
         g_RHO_RES_LOG   : integer := 2;     -- Clog2(Rho Resolution = 2)
         g_RHOS          : integer := 50;   -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
         g_THETAS        : integer := 180;   -- Can decrease this (e.g. to 64)
-        g_TOP_N         : integer := 4;    -- Number of top voted Rhos and Theta values to consider
+        g_TOP_N         : integer := 8;    -- Number of top voted Rhos and Theta values to consider
         g_BRAM_ADDR_WIDTH : integer := 10;  -- Clog2(g_RHOS * g_THETAS), size of BRAM to hold votes
         g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(g_HEIGHT * g_WIDTH), maximum count of votes for each Rho
         -- Quantization

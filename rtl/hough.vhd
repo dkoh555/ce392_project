@@ -13,7 +13,7 @@ entity hough is
         g_RHO_RES_LOG   : integer := 2;     -- Clog2(Rho Resolution = 4)
         g_RHOS          : integer := 50;    -- Sqrt(ROWS ^ 2 + COLS ^ 2) / Rho Resolution
         g_THETAS        : integer := 180;   -- With smaller images, reducing this resolution decreases accuracy significantly
-        g_TOP_N         : integer := 4;    -- Number of top voted Rhos and Theta values to consider
+        g_TOP_N         : integer := 8;    -- Number of top voted Rhos and Theta values to consider
         g_BRAM_ADDR_WIDTH : integer := 10;  -- Maximum size based on g_BRAM_DATA_WIDTH and maximum BRAM size
         g_BRAM_DATA_WIDTH : integer := 10;  -- Clog2(sqrt(g_HEIGHT^2 + g_WIDTH^2)), maximum count of votes for each Rho is the diagonal of the image
         -- Quantization
@@ -355,7 +355,12 @@ begin
                     for i in 0 to c_BRAMS - 1 loop
                         n_wr_addr(i) <= q_rd_addr(i);
                         n_wr_en(i) <= '1';
-                        n_wr_data(i) <= std_logic_vector(resize(unsigned(w_rd_data(i)) + to_unsigned(1, w_rd_data(i)'length), n_wr_data(i)'length));
+                        -- If the theta value won't translate to a lane line, don't even bother accumulating
+                        if ((q_theta(i) > 160) or (q_theta(i) < 100 and q_theta(i) > 80) or (q_theta(i) < 20)) then
+                            n_wr_data(i) <= (others => '0');
+                        else
+                            n_wr_data(i) <= std_logic_vector(resize(unsigned(w_rd_data(i)) + to_unsigned(1, w_rd_data(i)'length), n_wr_data(i)'length));
+                        end if;
                     end loop;
                 else
                     for i in 0 to c_BRAMS - 1 loop
