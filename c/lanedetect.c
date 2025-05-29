@@ -33,7 +33,11 @@ static const float cosvals[180] = {1.0, 0.9998476951563913, 0.9993908270190958, 
 // static const float cosvals[90] = {1.000000000000000, 0.999390827019096, 0.997564050259824, 0.994521895368273, 0.990268068741570, 0.984807753012208, 0.978147600733806, 0.970295726275996, 0.961261695938319, 0.951056516295154, 0.939692620785908, 0.927183854566787, 0.913545457642601, 0.898794046299167, 0.882947592858927, 0.866025403784439, 0.848048096156426, 0.829037572555042, 0.809016994374947, 0.788010753606722, 0.766044443118978, 0.743144825477394, 0.719339800338651, 0.694658370458997, 0.669130606358858, 0.642787609686539, 0.615661475325658, 0.587785252292473, 0.559192903470747, 0.529919264233205, 0.500000000000000, 0.469471562785891, 0.438371146789077, 0.406736643075800, 0.374606593415912, 0.342020143325669, 0.309016994374947, 0.275637355816999, 0.241921895599668, 0.207911690817759, 0.173648177666930, 0.139173100960066, 0.104528463267653, 0.069756473744125, 0.034899496702501, 0.000000000000000, -0.034899496702501, -0.069756473744125, -0.104528463267653, -0.139173100960065, -0.173648177666930, -0.207911690817759, -0.241921895599668, -0.275637355816999, -0.309016994374947, -0.342020143325669, -0.374606593415912, -0.406736643075800, -0.438371146789078, -0.469471562785891, -0.500000000000000, -0.529919264233205, -0.559192903470747, -0.587785252292473, -0.615661475325658, -0.642787609686539, -0.669130606358858, -0.694658370458997, -0.719339800338651, -0.743144825477394, -0.766044443118978, -0.788010753606722, -0.809016994374947, -0.829037572555042, -0.848048096156426, -0.866025403784439, -0.882947592858927, -0.898794046299167, -0.913545457642601, -0.927183854566787, -0.939692620785908, -0.951056516295154, -0.961261695938319, -0.970295726275996, -0.978147600733806, -0.984807753012208, -0.990268068741570, -0.994521895368273, -0.997564050259824, -0.999390827019096};
 
 // Lane Line Detection
-#define TOP_N 100
+#define TOP_N 16
+#define LEFT_LANE_LB 100
+#define LEFT_LANE_UB 160
+#define RIGHT_LANE_LB 20
+#define RIGHT_LANE_UB 80
 
 // Lane Line Calculation
 #define IMAGE_CENTER_X COLS/2
@@ -654,8 +658,14 @@ void hough_transform(unsigned char *in_data, int height, int width, unsigned int
                     //     printf("Buffer: %x\n\n", (theta % 20)* RHOS + rho);
                     //     getchar();
                     // }
-
-                    if (rho >= 0 && rho < RHOS) {
+                    if ((theta > LEFT_LANE_UB ) || // If greater than left lane upper bound
+                        (theta < LEFT_LANE_LB && theta > RIGHT_LANE_UB) || // If greater than right lane upper bound but also less than left lane lower bound
+                        (theta < RIGHT_LANE_LB)) { // If less than right lane lower bound
+                        // Do not update the accumulator
+                    } else if (rho >= 0 && rho < RHOS) {
+                        if (theta == 90 || theta == 0 || theta == 180) {
+                            printf("THE CODE SHOULD NEVER REACH THIS POINT\n");
+                        }
                         accum_buff[rho * THETAS + theta]++;
                     } else {
                         printf("RHO OUT OF BOUNDS, CONTINUING\n");
@@ -745,7 +755,7 @@ float calculate_center_lane(unsigned char *in_data, int height, int width, const
         int rho = rho_indices[i];
         int votes = vote_counts[i];
         // Only update if the new theta value is closer to 130 (theta - 130 is smaller)
-        if (theta >= 100 && theta <= 160 && top_left_votes <= votes) {
+        if (theta >= LEFT_LANE_LB && theta <= LEFT_LANE_UB && top_left_votes <= votes) {
             if (top_left_votes < votes || 
                 (abs(theta - 130) < abs(*left_theta_idx - 130) && top_left_votes == votes)) {
                 *left_rho_idx = rho_indices[i];
@@ -753,7 +763,7 @@ float calculate_center_lane(unsigned char *in_data, int height, int width, const
                 top_left_votes = votes;
                 left_i = i;
             }
-        } else if (theta >= 20 && theta <= 80 && top_right_votes <= votes) {
+        } else if (theta >= RIGHT_LANE_LB && theta <= RIGHT_LANE_UB && top_right_votes <= votes) {
             if (top_right_votes < votes || 
                 (abs(theta - 50) < abs(*right_theta_idx - 50) && top_right_votes == votes)) {
                 *right_rho_idx = rho_indices[i];
@@ -776,7 +786,7 @@ float calculate_center_lane(unsigned char *in_data, int height, int width, const
         printf("Error: Left lane not found\n");
         // Can't compute correction if both lines not found
         return 0.0f;
-    } else if (*left_rho_idx == -1 ) {
+    } else if (*right_rho_idx == -1 ) {
         printf("Error: Right lane not found\n");
         // Can't compute correction if both lines not found
         return 0.0f;
@@ -850,6 +860,7 @@ float calculate_center_lane(unsigned char *in_data, int height, int width, const
 
     // Don't perform division if overflow could occur
     if (cos_l == 0 || cos_r == 0) {
+        printf("left_theta_idx: %i, right_theta_idx: %i\n", *left_theta_idx, *right_theta_idx);
         printf("Error: Could not perform division\n");
         return 0;
     }
