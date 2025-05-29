@@ -27,3 +27,16 @@ add wave -noupdate -group hough_inst -radix hexadecimal  /my_uvm_tb/lanedetect_t
 
 add wave -noupdate -group center_lane_inst
 add wave -noupdate -group center_lane_inst -radix hexadecimal  /my_uvm_tb/lanedetect_top_inst/center_lane_inst/*
+
+# turn off std_logic_arith, std_logic_unsigned, and numeric_std warnings
+set StdArithNoWarnings      1
+set StdNumNoWarnings        1
+set NumericStdNoWarnings    1
+
+# run just to 0 ns (where your X/U’s live)
+run 0 ns
+
+# turn them back on for the rest of the sim
+set StdArithNoWarnings      0
+set StdNumNoWarnings        0
+set NumericStdNoWarnings    0
