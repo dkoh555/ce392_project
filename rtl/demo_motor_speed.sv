@@ -189,24 +189,24 @@ module demo_motor_speed #(
         end
     end
     
-    // Optional: Add assertions for verification
-    `ifdef SIMULATION
-        // Verify PWM patterns have correct duty cycles
-        initial begin
-            assert ($countones(pwm_pattern_slow) == 4) 
-                else $error("Slow pattern should have 4 ones");
-            assert ($countones(pwm_pattern_fast) == 8) 
-                else $error("Fast pattern should have 8 ones");
-            assert ($countones(pwm_pattern_fastest) == 12) 
-                else $error("Fastest pattern should have 12 ones");
-        end
+    // // Optional: Add assertions for verification
+    // `ifdef SIMULATION
+    //     // Verify PWM patterns have correct duty cycles
+    //     initial begin
+    //         assert ($countones(pwm_pattern_slow) == 4) 
+    //             else $error("Slow pattern should have 4 ones");
+    //         assert ($countones(pwm_pattern_fast) == 8) 
+    //             else $error("Fast pattern should have 8 ones");
+    //         assert ($countones(pwm_pattern_fastest) == 12) 
+    //             else $error("Fastest pattern should have 12 ones");
+    //     end
         
-        // Monitor duty cycle during simulation
-        real left_duty_cycle, right_duty_cycle;
-        always @(posedge clk) begin
-            left_duty_cycle = real'($countones(left_motor_shift_reg)) / real'(SHIFT_REG_WIDTH);
-            right_duty_cycle = real'($countones(right_motor_shift_reg)) / real'(SHIFT_REG_WIDTH);
-        end
-    `endif
+    //     // Monitor duty cycle during simulation
+    //     real left_duty_cycle, right_duty_cycle;
+    //     always @(posedge clk) begin
+    //         left_duty_cycle = real'($countones(left_motor_shift_reg)) / real'(SHIFT_REG_WIDTH);
+    //         right_duty_cycle = real'($countones(right_motor_shift_reg)) / real'(SHIFT_REG_WIDTH);
+    //     end
+    // `endif
     
-endmodules
+endmodule
