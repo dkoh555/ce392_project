@@ -1,5 +1,5 @@
 module demo_motor_speed #(
-    parameter int SHIFT_REG_WIDTH = 16     // PWM resolution
+    parameter int PWM_RESOLUTION = 8      // PWM counter width (8-bit = 256 levels)
 ) (
     input  logic                   clk,
     input  logic                   reset_n,       // active-low reset
@@ -21,27 +21,26 @@ module demo_motor_speed #(
     } speed_state_t;
 
     speed_state_t    current_speed, next_speed;
-    speed_state_t    prev_speed;
-    logic            speed_change;
 
     //----------------------------------------------------------------------  
-    // 2) PWM patterns as constants  
+    // 2) PWM duty cycle values (0-255 for 8-bit resolution)
     //----------------------------------------------------------------------  
-    localparam logic [SHIFT_REG_WIDTH-1:0] PAT_STOP    = {SHIFT_REG_WIDTH{1'b0}};  
-    localparam logic [SHIFT_REG_WIDTH-1:0] PAT_SLOW    = 16'h8888;  
-    localparam logic [SHIFT_REG_WIDTH-1:0] PAT_FAST    = 16'hAAAA;  
-    localparam logic [SHIFT_REG_WIDTH-1:0] PAT_FASTEST = 16'hEEEE;  
+    localparam logic [PWM_RESOLUTION-1:0] DUTY_STOP    = 8'd0;    // 0% duty cycle
+    localparam logic [PWM_RESOLUTION-1:0] DUTY_SLOW    = 8'd77;   // 30% duty cycle (77/255 ≈ 30%)
+    localparam logic [PWM_RESOLUTION-1:0] DUTY_FAST    = 8'd102;  // 40% duty cycle (102/255 ≈ 40%)
+    localparam logic [PWM_RESOLUTION-1:0] DUTY_FASTEST = 8'd153;  // 60% duty cycle (153/255 ≈ 60%)
 
     //----------------------------------------------------------------------  
-    // 3) Clock divider for PWM  
+    // 3) Clock divider for PWM (50MHz -> ~12kHz PWM frequency)
     //----------------------------------------------------------------------  
-    logic [7:0]      pwm_clock_div;
+    logic [11:0]     pwm_prescaler;      // 12-bit prescaler
     logic            pwm_clock_enable;
-
+    
     //----------------------------------------------------------------------  
-    // 4) Shift registers  
+    // 4) PWM counter and duty cycle registers
     //----------------------------------------------------------------------  
-    logic [SHIFT_REG_WIDTH-1:0] left_shift, right_shift;
+    logic [PWM_RESOLUTION-1:0] pwm_counter;
+    logic [PWM_RESOLUTION-1:0] left_duty, right_duty;
 
     //----------------------------------------------------------------------  
     // 5) Determine next speed from switches  
@@ -76,64 +75,73 @@ module demo_motor_speed #(
     end
 
     //----------------------------------------------------------------------  
-    // 7) Track previous speed for one-cycle detection  
-    //----------------------------------------------------------------------  
-    always_ff @(posedge clk) begin
-        if (!reset_n) prev_speed <= SPEED_STOP;
-        else           prev_speed <= current_speed;
-    end
-    assign speed_change = (current_speed != prev_speed);
-
-    //----------------------------------------------------------------------  
-    // 8) PWM clock divider  
-    //----------------------------------------------------------------------  
-    always_ff @(posedge clk) begin
-        if (!reset_n)           pwm_clock_div <= 8'd0;
-        else                    pwm_clock_div <= pwm_clock_div + 1;
-    end
-    assign pwm_clock_enable = (pwm_clock_div == 8'hFF);
-
-    //----------------------------------------------------------------------  
-    // 9) PWM generation: reload-on-speed-change, else rotate on enable  
+    // 7) PWM prescaler (divide by ~4096: 50MHz -> ~12kHz base frequency)
     //----------------------------------------------------------------------  
     always_ff @(posedge clk) begin
         if (!reset_n) begin
-            left_shift  <= PAT_STOP;
-            right_shift <= PAT_STOP;
+            pwm_prescaler <= 12'd0;
+        end else begin
+            pwm_prescaler <= pwm_prescaler + 1;
         end
-        else if (speed_change) begin
-            // immediate reload when speed changes
-            unique case (current_speed)
-                SPEED_SLOW:    left_shift  <= PAT_SLOW;
-                SPEED_FAST:    left_shift  <= PAT_FAST;
-                SPEED_FASTEST: left_shift  <= PAT_FASTEST;
-                default:       left_shift  <= PAT_STOP;
-            endcase
-            unique case (current_speed)
-                SPEED_SLOW:    right_shift <= PAT_SLOW;
-                SPEED_FAST:    right_shift <= PAT_FAST;
-                SPEED_FASTEST: right_shift <= PAT_FASTEST;
-                default:       right_shift <= PAT_STOP;
-            endcase
-        end
-        else if (pwm_clock_enable) begin
-            // rotate shift-register otherwise
-            left_shift  <= { left_shift [SHIFT_REG_WIDTH-2:0], left_shift [SHIFT_REG_WIDTH-1] };
-            right_shift <= { right_shift[SHIFT_REG_WIDTH-2:0], right_shift[SHIFT_REG_WIDTH-1] };
+    end
+    assign pwm_clock_enable = (pwm_prescaler == 12'd0);  // overflow every 4096 clocks
+
+    //----------------------------------------------------------------------  
+    // 8) PWM counter (counts 0 to 255 for 8-bit resolution)
+    //----------------------------------------------------------------------  
+    always_ff @(posedge clk) begin
+        if (!reset_n) begin
+            pwm_counter <= {PWM_RESOLUTION{1'b0}};
+        end else if (pwm_clock_enable) begin
+            pwm_counter <= pwm_counter + 1;  // auto-wraps at 256
         end
     end
 
     //----------------------------------------------------------------------  
-    // 10) PWM outputs = MSB of each shift register  
+    // 9) Duty cycle assignment based on current speed
+    //----------------------------------------------------------------------  
+    always_ff @(posedge clk) begin
+        if (!reset_n) begin
+            left_duty  <= DUTY_STOP;
+            right_duty <= DUTY_STOP;
+        end else begin
+            case (current_speed)
+                SPEED_STOP:    begin
+                    left_duty  <= DUTY_STOP;
+                    right_duty <= DUTY_STOP;
+                end
+                SPEED_SLOW:    begin
+                    left_duty  <= DUTY_SLOW;
+                    right_duty <= DUTY_SLOW;
+                end
+                SPEED_FAST:    begin
+                    left_duty  <= DUTY_FAST;
+                    right_duty <= DUTY_FAST;
+                end
+                SPEED_FASTEST: begin
+                    left_duty  <= DUTY_FASTEST;
+                    right_duty <= DUTY_FASTEST;
+                end
+                default: begin
+                    left_duty  <= DUTY_STOP;
+                    right_duty <= DUTY_STOP;
+                end
+            endcase
+        end
+    end
+
+    //----------------------------------------------------------------------  
+    // 10) PWM output generation (traditional PWM comparison)
     //----------------------------------------------------------------------  
     always_ff @(posedge clk) begin
         if (!reset_n) begin
             motor_left_pwm  <= 1'b0;
             motor_right_pwm <= 1'b0;
         end else begin
-            motor_left_pwm  <= left_shift [SHIFT_REG_WIDTH-1];
-            motor_right_pwm <= right_shift[SHIFT_REG_WIDTH-1];
+            // PWM output is high when counter < duty cycle
+            motor_left_pwm  <= (pwm_counter < left_duty);
+            motor_right_pwm <= (pwm_counter < right_duty);
         end
-    end
+    end
 
 endmodule
