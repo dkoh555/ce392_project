@@ -7,9 +7,7 @@ module demo_motor_speed #(
     input  logic                   switch_b,      // fast
     output logic                   motor_left_pwm,
     output logic                   motor_right_pwm,
-    output logic [2:0]             speed_leds,
-	output logic					motor_l_dead,
-	output logic					motor_r_dead
+    output logic [2:0]             speed_leds
 );
 
     //----------------------------------------------------------------------  
@@ -145,8 +143,5 @@ module demo_motor_speed #(
             motor_right_pwm <= (pwm_counter < right_duty);
         end
     end
-	
-	assign motor_l_dead = 1'b0;
-	assign motor_l_dead = 1'b0;
 
 endmodule

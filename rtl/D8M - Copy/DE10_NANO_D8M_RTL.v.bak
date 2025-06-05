@@ -51,8 +51,6 @@ module  DE10_NANO_D8M_RTL(
 	output						FIFO_RDEMPTY,
 	output			[23:0]		FIFO_RDDATA
 	
-//	output 						DEBUG
-	
 );
 //=======================================================
 //  REG/WIRE declarations
@@ -165,7 +163,7 @@ VIDEO_PLL pll2(
 //--FRAME BUFFER using ON-CHIP SRAM---
 ON_CHIP_FRAM  fra( 
          .W_CLK        ( MIPI_PIXEL_CLK ),   
-         .W_DE         ( LUT_MIPI_PIXEL_HS & LUT_MIPI_PIXEL_VS),  
+         .W_DE         ( LUT_MIPI_PIXEL_HS & LUT_MIPI_PIXEL_VS & fifonotfull ),  
          .W_DATA       ( LUT_MIPI_PIXEL_D[9:0] ), 
          .W_CLR        ( LUT_MIPI_PIXEL_VS ), 	      
 	      .R_CLK        ( VGA_CLK), 
@@ -267,21 +265,21 @@ wire [23:0] downsampler_data_out;
 
 sample_every_4 downsampler (
 	.clk(VGA_CLK),
-	.rst_n(1),
+	.rst_n(RESET_N),
 	.data_in(HDMI_TX_D),
-	.wr_en(READ_Request),
+	.wr_en(fifonotfull & READ_Request),
 	.valid(downsampler_valid),
 	.data_out(downsampler_data_out)
 );
 
 wire fifoclear;
-assign fifoclear = ~RESET_N;
+assign fifoclear= ~RESET_N;
 wire fifofull; // Should shut off the camera or ignore incoming frame data
 wire fifonotfull;
 assign fifonotfull = ~fifofull;
 
 Pixel_FIFO out_fifo (
-	.aclr	(0),
+	.aclr	(fifoclear),
 	.rdreq	(FIFO_RDEN),
 	.rdclk	(FIFO_RDCLK),
 	.q		(FIFO_RDDATA),
@@ -291,8 +289,6 @@ Pixel_FIFO out_fifo (
 	.wrclk	(VGA_CLK),
 	.wrfull	(fifofull)
 );
-
-//assign DEBUG = fifofull;
 
 endmodule
 

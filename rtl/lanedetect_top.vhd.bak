@@ -33,58 +33,20 @@ entity lanedetect_top is
 
     port (
         i_CLK       : in    std_logic;
-        --i_RST       : in    std_logic;
+        i_RST       : in    std_logic;
 
         -- Input data
-        -- i_PIXEL     : in    std_logic_vector(23 downto 0);
-        --o_FULL      : out   std_logic;
-        --i_WR_EN     : in    std_logic;
+        i_PIXEL     : in    std_logic_vector(23 downto 0);
+        o_FULL      : out   std_logic;
+        i_WR_EN     : in    std_logic;
 
         -- Output control signals
         o_EMPTY         : out   std_logic;
+        i_RD_EN         : in    std_logic;
         
         -- Direct PWM motor outputs
         o_LEFT_MOTOR_PWM    : out   std_logic;
-        o_RIGHT_MOTOR_PWM   : out   std_logic;
-		o_LEFT_MOTOR_INACTIVE	:	out	std_logic;
-		o_RIGHT_MOTOR_INACTIVE	:	out std_logic;
-		
-		-- CLOCKS --
-		i_FPGA_CLK1_50		:	in std_logic;
-		i_FPGA_CLK2_50		:	in std_logic;
-		i_FPGA_CLK3_50		:	in std_logic;
-		-- HDMI --
-		i_HDMI_I2C_SCL		:	inout std_logic;
-		i_HDMI_I2C_SDA		:	inout std_logic;
-		i_HDMI_I2S			:	inout std_logic;
-		i_HDMI_LRCLK			:	inout std_logic;
-		i_HDMI_MCLK			:	inout std_logic;
-		i_HDMI_SCLK			:	inout std_logic;
-		i_HDMI_TX_CLK			:	out std_logic;
-		i_HDMI_TX_DE			:	out std_logic;
-		i_HDMI_TX_D			:	out std_logic_vector(23 downto 0);
-		i_HDMI_TX_HS			:	out std_logic;
-		i_HDMI_TX_INT			:	in std_logic;
-		i_HDMI_TX_VS			:	out std_logic;
-		-- KEY --
-		i_KEY					:	in std_logic_vector(1 downto 0);
-		-- SW --
-		i_SW					:	in std_logic_vector(3 downto 0);
-		-- GPIO_0 (D8M) --
-		i_CAMERA_I2C_SCL			:	inout std_logic;
-		i_CAMERA_I2C_SDA			:	inout std_logic;
-		i_CAMERA_PWDN_n			:	out std_logic;
-		i_MIPI_CS_n				:	out std_logic;
-		i_MIPI_I2C_SCL			:	inout std_logic;
-		i_MIPI_I2C_SDA			:	inout std_logic;
-		i_MIPI_MCLK				:	out std_logic;
-		i_MIPI_PIXEL_CLK			:	in std_logic;
-		i_MIPI_PIXEL_D			:	in std_logic_vector(9 downto 0);
-		i_MIPI_PIXEL_HS			:	in std_logic;
-		i_MIPI_PIXEL_VS			:	in std_logic;
-		i_MIPI_REFCLK				:	out std_logic;
-		i_MIPI_RESET_n			:	out std_logic
---		o_DEBUG					:	out std_logic
+        o_RIGHT_MOTOR_PWM   : out   std_logic
     );
 
 end entity lanedetect_top;
@@ -337,52 +299,6 @@ architecture rtl of lanedetect_top is
             o_right_motor_pwm : out std_logic
         );
     end component motor_control;
-	
-	component DE10_NANO_D8M_RTL is
-		port (
-			-- CLOCKS --
-			FPGA_CLK1_50		:	in std_logic;
-			FPGA_CLK2_50		:	in std_logic;
-			FPGA_CLK3_50		:	in std_logic;
-			-- HDMI --
-			HDMI_I2C_SCL		:	inout std_logic;
-			HDMI_I2C_SDA		:	inout std_logic;
-			HDMI_I2S			:	inout std_logic;
-			HDMI_LRCLK			:	inout std_logic;
-			HDMI_MCLK			:	inout std_logic;
-			HDMI_SCLK			:	inout std_logic;
-			HDMI_TX_CLK			:	out std_logic;
-			HDMI_TX_DE			:	out std_logic;
-			HDMI_TX_D			:	out std_logic_vector(23 downto 0);
-			HDMI_TX_HS			:	out std_logic;
-			HDMI_TX_INT			:	in std_logic;
-			HDMI_TX_VS			:	out std_logic;
-			-- KEY --
-			KEY					:	in std_logic_vector(1 downto 0);
-			-- SW --
-			SW					:	in std_logic_vector(3 downto 0);
-			-- GPIO_0 (D8M) --
-			CAMERA_I2C_SCL			:	inout std_logic;
-			CAMERA_I2C_SDA			:	inout std_logic;
-			CAMERA_PWDN_n			:	out std_logic;
-			MIPI_CS_n				:	out std_logic;
-			MIPI_I2C_SCL			:	inout std_logic;
-			MIPI_I2C_SDA			:	inout std_logic;
-			MIPI_MCLK				:	out std_logic;
-			MIPI_PIXEL_CLK			:	in std_logic;
-			MIPI_PIXEL_D			:	in std_logic_vector(9 downto 0);
-			MIPI_PIXEL_HS			:	in std_logic;
-			MIPI_PIXEL_VS			:	in std_logic;
-			MIPI_REFCLK				:	out std_logic;
-			MIPI_RESET_n			:	out std_logic;
-			-- FIFO --
-			FIFO_RDEN				:	in std_logic;
-			FIFO_RDCLK				:	in std_logic;
-			FIFO_RDEMPTY			:	out std_logic;
-			FIFO_RDDATA				:	out std_logic_vector(23 downto 0)
---			DEBUG					:	out std_logic
-		);
-	end component DE10_NANO_D8M_RTL;
 
     -- All existing signals remain the same...
     signal w_input_rd_en : std_logic;
@@ -475,82 +391,29 @@ architecture rtl of lanedetect_top is
     signal w_motor_control_valid : std_logic;
     signal w_motor_control_ready : std_logic;
     signal w_reset_n : std_logic;
-	
-	-- Signals for camera interface
-	signal i_RST : std_logic;
+
 begin
 
-	i_RST <= not i_KEY(0);
-	o_LEFT_MOTOR_INACTIVE <= '0';
-	o_RIGHT_MOTOR_INACTIVE <= '0';
     -- Convert active-high reset to active-low for motor control module
     w_reset_n <= not i_RST;
-	
-	-- Camera instantiation
-	camera_inst	:	DE10_NANO_D8M_RTL
-		port map (
-			-- CLOCKS --
-			FPGA_CLK1_50 => i_FPGA_CLK1_50,
-			FPGA_CLK2_50 => i_FPGA_CLK2_50,
-			FPGA_CLK3_50 => i_FPGA_CLK3_50,
-			-- HDMI --
-			HDMI_I2C_SCL => i_HDMI_I2C_SCL,
-			HDMI_I2C_SDA => i_HDMI_I2C_SDA,
-			HDMI_I2S => i_HDMI_I2S,
-			HDMI_LRCLK => i_HDMI_LRCLK,
-			HDMI_MCLK => i_HDMI_MCLK,
-			HDMI_SCLK => i_HDMI_SCLK,
-			HDMI_TX_CLK => i_HDMI_TX_CLK,
-			HDMI_TX_DE => i_HDMI_TX_DE,
-			HDMI_TX_D => i_HDMI_TX_D,
-			HDMI_TX_HS => i_HDMI_TX_HS,
-			HDMI_TX_INT => i_HDMI_TX_INT,
-			HDMI_TX_VS => i_HDMI_TX_VS,
-			-- KEY --
-			KEY => i_KEY,
-			-- SW --
-			SW => i_SW,
-			-- GPIO_0 (D8M) --
-			CAMERA_I2C_SCL => i_CAMERA_I2C_SCL,
-			CAMERA_I2C_SDA => i_CAMERA_I2C_SDA,
-			CAMERA_PWDN_n => i_CAMERA_PWDN_n,
-			MIPI_CS_n => i_MIPI_CS_n,
-			MIPI_I2C_SCL => i_MIPI_I2C_SCL,
-			MIPI_I2C_SDA => i_MIPI_I2C_SDA,
-			MIPI_MCLK => i_MIPI_MCLK,
-			MIPI_PIXEL_CLK => i_MIPI_PIXEL_CLK,
-			MIPI_PIXEL_D => i_MIPI_PIXEL_D,
-			MIPI_PIXEL_HS => i_MIPI_PIXEL_HS,
-			MIPI_PIXEL_VS => i_MIPI_PIXEL_VS,
-			MIPI_REFCLK => i_MIPI_REFCLK,
-			MIPI_RESET_n => i_MIPI_RESET_n,
-			-- FIFO --
-			FIFO_RDEN => w_input_rd_en,
-			FIFO_RDCLK => i_CLK,
-			FIFO_RDEMPTY => w_input_empty,
-			FIFO_RDDATA => w_input_data
---			DEBUG => o_DEBUG
-		);
-		
-		o_EMPTY <= w_input_empty;
 
     -- All existing component instantiations remain exactly the same...
---    input_fifo_inst : fifo
---        generic map (
---            FIFO_DATA_WIDTH     => 24,
---            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
---        )
---        port map (
---            reset   => i_RST,
---            wr_clk  => i_CLK,
---            wr_en   => i_WR_EN,
---            din     => i_PIXEL,
---            full    => o_FULL,
---            rd_clk  => i_CLK,
---            rd_en   => w_input_rd_en,
---            dout    => w_input_data,
---            empty   => w_input_empty
---        );
+    input_fifo_inst : fifo
+        generic map (
+            FIFO_DATA_WIDTH     => 24,
+            FIFO_BUFFER_SIZE    => g_FIFO_BUFFER_SIZE
+        )
+        port map (
+            reset   => i_RST,
+            wr_clk  => i_CLK,
+            wr_en   => i_WR_EN,
+            din     => i_PIXEL,
+            full    => o_FULL,
+            rd_clk  => i_CLK,
+            rd_en   => w_input_rd_en,
+            dout    => w_input_data,
+            empty   => w_input_empty
+        );
 
     grayscale_inst : grayscale
         generic map (
@@ -976,12 +839,7 @@ begin
     -- Generate valid signal when data is available and motor control is ready
     w_motor_control_valid <= (not w_center_lane_empty) and w_motor_control_ready;
     w_center_lane_rd_en <= w_motor_control_valid;  -- Read when we send valid data
-	
---	o_LEFT_MOTOR_PWM <= '1';
---	o_RIGHT_MOTOR_PWM <= '1';
 
-    --o_EMPTY <= w_center_lane_empty;
-	
-	
+    o_EMPTY <= w_center_lane_empty;
 
 end architecture rtl;
